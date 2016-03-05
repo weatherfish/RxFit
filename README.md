@@ -6,7 +6,7 @@ This library wraps the Fit API in [RxJava](https://github.com/ReactiveX/RxJava) 
 
 # Usage
 
-Initialize RxFit once, preferably in your Application `onCreate()` via `RxFit.init(...)`. Make sure to include all the APIs and Scopes that you need for your app. The RxFit class is very similar to the Fitness class provided by the Fit API. Instead of `Fitness.HistoryApi.readData(apiClient, dataReadRequest)` you can use `RxFit.History.read(dataReadRequest)`. Make sure to have the Location and Body Sensors permission from Marshmallow on, if they are needed by your Fit API requests.
+Initialize RxFit once, preferably in your Application `onCreate()` via `RxFit.init(...)`. Make sure to include all the APIs and Scopes that you need for your app. The RxFit class is very similar to the Fitness class provided by the Fit API. Instead of `Fitness.HistoryApi.readData(apiClient, dataReadRequest)` you can use `RxFit.History.read(dataReadRequest)`. Make sure to have the Location and Body Sensors permission from Marshmallow on, if they are needed by your Fit API requests. If the user didn’t already authorize your app for using fitness data, the lib handles showing the authorization dialog.
 
 Example:
 
@@ -32,6 +32,13 @@ RxFit.History.read(dataReadRequest)
 ```
 
 You can also obtain an `Observable<GoogleApiClient>`, which connects on subscribe and disconnects on unsubscribe via `GoogleAPIClientObservable.create(...)`.
+
+The following Exceptions are thrown in the lib and provided via `onError()`:
+
+* `StatusException`: When the call to the Fit API was not successful.
+* `GoogleAPIConnectionException`: When connecting to the GoogleAPIClient was not successful and the resolution (if available) was also not successful (e.g. when the user does not authorize your app to use fitness data). Resolutions are not handled when using `GoogleAPIClientObservable`.
+* `GoogleAPIConnectionSuspendedException`: When the GoogleApiClient connection was suspended.
+* `PermissionRequiredException` or `SecurityException`: When you try to call a Fit API without proper permissions.
 
 # Sample
 
