@@ -1,5 +1,7 @@
 # Reactive Fit API Library for Android
 
+[![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=master)](https://travis-ci.org/patloew/RxFit)  [ ![Download](https://api.bintray.com/packages/patloew/maven/com.patloew.rxfit/images/download.svg) ](https://bintray.com/patloew/maven/com.patloew.rxfit/_latestVersion)
+
 This library wraps the Fit API in [RxJava](https://github.com/ReactiveX/RxJava) Observables. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
 
 # Usage
@@ -37,11 +39,7 @@ A basic sample app is available in the `sample` project. You need to create an O
 
 # Setup
 
-Add the following to your `build.gradle`:
-
-	repositories {
-	    maven { url 'https://dl.bintray.com/patloew/maven' }
-	}
+The lib is available on jCenter. Add the following to your `build.gradle`:
 
 	dependencies {
 	    compile 'com.patloew.rxfit:rxfit:1.0.0'
