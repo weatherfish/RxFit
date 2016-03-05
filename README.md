@@ -35,6 +35,18 @@ You can also obtain an `Observable<GoogleApiClient>`, which connects on subscrib
 
 A basic sample app is available in the `sample` project. You need to create an OAuth 2.0 Client ID for the sample app, see the [guide in the Fit API docs](https://developers.google.com/fit/android/get-api-key).
 
+# Setup
+
+Add the following to your `build.gradle`:
+
+	repositories {
+	    maven { url 'https://dl.bintray.com/patloew/maven' }
+	}
+
+	dependencies {
+	    compile 'com.patloew.rxfit:rxfit:1.0.0'
+	}
+
 # Credits
 
 The code for managing the GoogleApiClient is taken from the [Android-ReactiveLocation](https://github.com/mcharmas/Android-ReactiveLocation) library by Michał Charmas, which is licensed under the Apache License, Version 2.0.
