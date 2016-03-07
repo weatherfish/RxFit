@@ -65,6 +65,7 @@ import org.powermock.reflect.Whitebox;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 import rx.Subscriber;
 import rx.observers.TestSubscriber;
@@ -138,6 +139,19 @@ public class RxFitTest {
     }
 
     @SuppressWarnings("unchecked")
+    // Mock GoogleApiClient connection error behaviour
+    private void setupBaseObservableError(final BaseObservable baseObservable) {
+        doReturn(apiClient).when(baseObservable).createApiClient(Matchers.<Subscriber>any());
+        doAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                baseObservable.subscriber.onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient.", connectionResult));
+                return null;
+            }
+        }).when(apiClient).connect();
+    }
+
+    @SuppressWarnings("unchecked")
     private void setPendingResultValue(final Result result) {
         doAnswer(new Answer() {
             @Override
@@ -151,14 +165,12 @@ public class RxFitTest {
     private void assertError(TestSubscriber sub, Class<? extends Throwable> errorClass) {
         sub.assertError(errorClass);
         sub.assertNoValues();
-        sub.assertTerminalEvent();
         sub.assertUnsubscribed();
     }
 
     @SuppressWarnings("unchecked")
     private void assertSingleValue(TestSubscriber sub, Object value) {
-        sub.assertNoErrors();
-        sub.assertTerminalEvent();
+        sub.assertCompleted();
         sub.assertUnsubscribed();
         sub.assertValue(value);
     }
@@ -187,21 +199,37 @@ public class RxFitTest {
         TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
         final GoogleAPIClientObservable observable = spy(new GoogleAPIClientObservable(ctx, new Api[] {}, new Scope[] {}));
 
-        // Mock GoogleApiClient connection error behaviour
-        doReturn(apiClient).when(observable).createApiClient(Matchers.<Subscriber>any());
-        doAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                observable.subscriber.onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient.", connectionResult));
-                return null;
-            }
-        }).when(apiClient).connect();
-
+        setupBaseObservableError(observable);
         Observable.create(observable).subscribe(sub);
 
         assertError(sub, GoogleAPIConnectionException.class);
     }
 
+    // CheckConnectionCompletable
+
+    @Test
+    public void CheckConnectionCompletable_Success() {
+        TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
+        CheckConnectionCompletable observable = spy(new CheckConnectionCompletable(rxFit));
+
+        setupBaseObservableSuccess(observable);
+        Completable.fromObservable(Observable.create(observable)).subscribe(sub);
+
+        sub.assertCompleted();
+        sub.assertNoValues();
+    }
+
+    @Test
+    public void CheckConnectionCompletable_Error() {
+        TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
+        CheckConnectionCompletable observable = spy(new CheckConnectionCompletable(rxFit));
+
+        setupBaseObservableError(observable);
+        Completable.fromObservable(Observable.create(observable)).subscribe(sub);
+
+        sub.assertError(GoogleAPIConnectionException.class);
+        sub.assertNoValues();
+    }
 
     /*******
      * BLE *

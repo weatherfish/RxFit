@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
         subscription = RxFit.History.read(dataReadRequest)
                 .flatMap(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(bucket -> {
                     FitnessSessionData fitnessSessionData = new FitnessSessionData();
                     fitnessSessionData.name = bucket.getSession().getName();

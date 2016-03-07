@@ -30,6 +30,7 @@ import com.google.android.gms.fitness.result.SessionReadResult;
 
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 
 /* Factory for Google Fit API observables. Make sure to include all the APIs
@@ -81,9 +82,21 @@ public class RxFit {
     Scope[] getScopes() {
         return scopes;
     }
-    
-    
-    
+
+
+    /* Can be used to check whether connection to Fit API was successful.
+     * For example, a wear app might need to be notified, if the user
+     * allowed accessing fitness data (which means that the connection
+     * was successful). As an alternative, use doOnCompleted(...) and
+     * doOnError(...) on any other RxFit Observable.
+     *
+     * This Completable completes if the connection was successful.
+     */
+    public static Completable checkConnection() {
+        return CheckConnectionCompletable.create(RxFit.get());
+    }
+
+
     public static class Ble {
 
         private Ble() { }
