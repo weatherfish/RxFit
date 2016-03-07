@@ -10,30 +10,22 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.result.BleDevicesResult;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
 import rx.Observer;
 
 public class BleListClaimedDevicesObservable extends BaseObservable<List<BleDevice>> {
 
     private final DataType dataType;
 
-    static Observable<List<BleDevice>> create(@NonNull RxFit rxFit) {
-        return Observable.create(new BleListClaimedDevicesObservable(rxFit, null));
-    }
-
-    static Observable<List<BleDevice>> create(@NonNull RxFit rxFit, DataType dataType) {
-        return Observable.create(new BleListClaimedDevicesObservable(rxFit, dataType));
-    }
-
-    BleListClaimedDevicesObservable(RxFit rxFit, DataType dataType) {
-        super(rxFit);
+    BleListClaimedDevicesObservable(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.dataType = dataType;
     }
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Observer<? super List<BleDevice>> observer) {
-        Fitness.BleApi.listClaimedBleDevices(apiClient).setResultCallback(new ResultCallback<BleDevicesResult>() {
+        setupFitnessPendingResult(Fitness.BleApi.listClaimedBleDevices(apiClient), new ResultCallback<BleDevicesResult>() {
             @Override
             public void onResult(@NonNull BleDevicesResult bleDevicesResult) {
                 if (!bleDevicesResult.getStatus().isSuccess()) {

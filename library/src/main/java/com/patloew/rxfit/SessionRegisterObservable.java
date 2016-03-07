@@ -1,30 +1,26 @@
 package com.patloew.rxfit;
 
 import android.app.PendingIntent;
-import android.support.annotation.NonNull;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 
-import rx.Observable;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observer;
 
 public class SessionRegisterObservable extends BaseObservable<Status> {
 
     private final PendingIntent pendingIntent;
 
-    static Observable<Status> create(@NonNull RxFit rxFit, @NonNull PendingIntent pendingIntent) {
-        return Observable.create(new SessionRegisterObservable(rxFit, pendingIntent));
-    }
-
-    SessionRegisterObservable(RxFit rxFit, PendingIntent pendingIntent) {
-        super(rxFit);
+    SessionRegisterObservable(RxFit rxFit, PendingIntent pendingIntent, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.pendingIntent = pendingIntent;
     }
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Observer<? super Status> observer) {
-        Fitness.SessionsApi.registerForSessions(apiClient, pendingIntent).setResultCallback(new StatusResultCallBack(observer));
+        setupFitnessPendingResult(Fitness.SessionsApi.registerForSessions(apiClient, pendingIntent), new StatusResultCallBack(observer));
     }
 }

@@ -1,14 +1,13 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.BleDevice;
 
-import rx.Observable;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observer;
 
 public class BleClaimDeviceObservable extends BaseObservable<Status> {
@@ -16,16 +15,8 @@ public class BleClaimDeviceObservable extends BaseObservable<Status> {
     private final BleDevice bleDevice;
     private final String deviceAddress;
 
-    static Observable<Status> create(@NonNull RxFit rxFit, @NonNull BleDevice bleDevice) {
-        return Observable.create(new BleClaimDeviceObservable(rxFit, bleDevice, null));
-    }
-
-    static Observable<Status> create(@NonNull RxFit rxFit, @NonNull String deviceAddress) {
-        return Observable.create(new BleClaimDeviceObservable(rxFit, null, deviceAddress));
-    }
-
-    BleClaimDeviceObservable(RxFit rxFit, BleDevice bleDevice, String deviceAddress) {
-        super(rxFit);
+    BleClaimDeviceObservable(RxFit rxFit, BleDevice bleDevice, String deviceAddress, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.bleDevice = bleDevice;
         this.deviceAddress = deviceAddress;
     }
@@ -33,11 +24,11 @@ public class BleClaimDeviceObservable extends BaseObservable<Status> {
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Observer<? super Status> observer) {
         ResultCallback<Status> resultCallback = new StatusResultCallBack(observer);
-
         if(bleDevice != null) {
-            Fitness.BleApi.claimBleDevice(apiClient, bleDevice).setResultCallback(resultCallback);
+            setupFitnessPendingResult(Fitness.BleApi.claimBleDevice(apiClient, bleDevice), resultCallback);
         } else {
-            Fitness.BleApi.claimBleDevice(apiClient, deviceAddress).setResultCallback(resultCallback);
+            setupFitnessPendingResult(Fitness.BleApi.claimBleDevice(apiClient, deviceAddress), resultCallback);
+
         }
     }
 }

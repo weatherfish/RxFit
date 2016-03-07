@@ -1,6 +1,6 @@
 # Reactive Fit API Library for Android
 
-[![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=master)](https://travis-ci.org/patloew/RxFit)  [ ![Download](https://api.bintray.com/packages/patloew/maven/com.patloew.rxfit/images/download.svg) ](https://bintray.com/patloew/maven/com.patloew.rxfit/_latestVersion) [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
+[![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=master)](https://travis-ci.org/patloew/RxFit) [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
 
 This library wraps the Fit API in [RxJava](https://github.com/ReactiveX/RxJava) Observables. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
 
@@ -31,11 +31,13 @@ RxFit.History.read(dataReadRequest)
         });
 ```
 
+An optional global default timeout for all Fit API requests made through the library can be set via `RxFit.setDefaultTimeout(...)`. In addition, timeouts can be set when creating a new Observable by providing timeout parameters, e.g. `RxFit.History.read(dataReadRequest, 15, TimeUnit.SECONDS)`. These parameters override the default timeout. When a timeout occurs, a StatusException is provided via `onError()`. The RxJava timeout operators can be used instead, but these do not cancel the Fit API request immediately.
+
 You can also obtain an `Observable<GoogleApiClient>`, which connects on subscribe and disconnects on unsubscribe via `GoogleAPIClientObservable.create(...)`.
 
 The following Exceptions are thrown in the lib and provided via `onError()`:
 
-* `StatusException`: When the call to the Fit API was not successful.
+* `StatusException`: When the call to the Fit API was not successful or timed out
 * `GoogleAPIConnectionException`: When connecting to the GoogleAPIClient was not successful and the resolution (if available) was also not successful (e.g. when the user does not authorize your app to use fitness data). Resolutions are not handled when using `GoogleAPIClientObservable`.
 * `GoogleAPIConnectionSuspendedException`: When the GoogleApiClient connection was suspended.
 * `SecurityException`: When you try to call a Fit API without proper permissions.
@@ -49,7 +51,7 @@ A basic sample app is available in the `sample` project. You need to create an O
 The lib is available on jCenter. Add the following to your `build.gradle`:
 
 	dependencies {
-	    compile 'com.patloew.rxfit:rxfit:1.0.0'
+	    compile 'com.patloew.rxfit:rxfit:1.1.0'
 	}
 
 # Credits

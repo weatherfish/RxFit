@@ -11,8 +11,8 @@ import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.result.DataSourcesResult;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
 import rx.Observer;
 
 public class SensorsFindDataSourcesObservable extends BaseObservable<List<DataSource>> {
@@ -20,23 +20,15 @@ public class SensorsFindDataSourcesObservable extends BaseObservable<List<DataSo
     private final DataSourcesRequest dataSourcesRequest;
     private final DataType dataType;
 
-    static Observable<List<DataSource>> create(@NonNull RxFit rxFit, @NonNull DataSourcesRequest dataSourcesRequest) {
-        return Observable.create(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, null));
-    }
-
-    static Observable<List<DataSource>> create(@NonNull RxFit rxFit, @NonNull DataSourcesRequest dataSourcesRequest, DataType dataType) {
-        return Observable.create(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, dataType));
-    }
-
-    SensorsFindDataSourcesObservable(RxFit rxFit, DataSourcesRequest dataSourcesRequest, DataType dataType) {
-        super(rxFit);
+    SensorsFindDataSourcesObservable(RxFit rxFit, DataSourcesRequest dataSourcesRequest, DataType dataType, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.dataSourcesRequest = dataSourcesRequest;
         this.dataType = dataType;
     }
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Observer<? super List<DataSource>> observer) {
-        Fitness.SensorsApi.findDataSources(apiClient, dataSourcesRequest).setResultCallback(new ResultCallback<DataSourcesResult>() {
+        setupFitnessPendingResult(Fitness.SensorsApi.findDataSources(apiClient, dataSourcesRequest), new ResultCallback<DataSourcesResult>() {
             @Override
             public void onResult(@NonNull DataSourcesResult dataSourcesResult) {
                 if (!dataSourcesResult.getStatus().isSuccess()) {

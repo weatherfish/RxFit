@@ -2,7 +2,6 @@ package com.patloew.rxfit;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -210,7 +209,7 @@ public class RxFitTest {
     @Test
     public void CheckConnectionCompletable_Success() {
         TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
-        CheckConnectionCompletable observable = spy(new CheckConnectionCompletable(rxFit));
+        CheckConnectionObservable observable = spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableSuccess(observable);
         Completable.fromObservable(Observable.create(observable)).subscribe(sub);
@@ -222,7 +221,7 @@ public class RxFitTest {
     @Test
     public void CheckConnectionCompletable_Error() {
         TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
-        CheckConnectionCompletable observable = spy(new CheckConnectionCompletable(rxFit));
+        CheckConnectionObservable observable = spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableError(observable);
         Completable.fromObservable(Observable.create(observable)).subscribe(sub);
@@ -241,7 +240,7 @@ public class RxFitTest {
     public void BleClaimDeviceObservable_BleDevice_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         BleDevice bleDevice = Mockito.mock(BleDevice.class);
-        BleClaimDeviceObservable observable = spy(new BleClaimDeviceObservable(rxFit, bleDevice, null));
+        BleClaimDeviceObservable observable = spy(new BleClaimDeviceObservable(rxFit, bleDevice, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -257,7 +256,7 @@ public class RxFitTest {
     public void BleClaimDeviceObservable_DeviceAddress_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         String deviceAddress = "deviceAddress";
-        BleClaimDeviceObservable observable = spy(new BleClaimDeviceObservable(rxFit, null, deviceAddress));
+        BleClaimDeviceObservable observable = spy(new BleClaimDeviceObservable(rxFit, null, deviceAddress, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -273,7 +272,7 @@ public class RxFitTest {
     public void BleClaimDeviceObservable_BleDevice_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         BleDevice bleDevice = Mockito.mock(BleDevice.class);
-        BleClaimDeviceObservable observable = spy(new BleClaimDeviceObservable(rxFit, bleDevice, null));
+        BleClaimDeviceObservable observable = spy(new BleClaimDeviceObservable(rxFit, bleDevice, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -289,7 +288,7 @@ public class RxFitTest {
     public void BleClaimDeviceObservable_DeviceAddress_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         String deviceAddress = "deviceAddress";
-        BleClaimDeviceObservable observable = spy(new BleClaimDeviceObservable(rxFit, null, deviceAddress));
+        BleClaimDeviceObservable observable = spy(new BleClaimDeviceObservable(rxFit, null, deviceAddress, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -308,7 +307,7 @@ public class RxFitTest {
     public void BleUnclaimDeviceObservable_BleDevice_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         BleDevice bleDevice = Mockito.mock(BleDevice.class);
-        BleUnclaimDeviceObservable observable = spy(new BleUnclaimDeviceObservable(rxFit, bleDevice, null));
+        BleUnclaimDeviceObservable observable = spy(new BleUnclaimDeviceObservable(rxFit, bleDevice, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -324,7 +323,7 @@ public class RxFitTest {
     public void BleUnclaimDeviceObservable_DeviceAddress_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         String deviceAddress = "deviceAddress";
-        BleUnclaimDeviceObservable observable = spy(new BleUnclaimDeviceObservable(rxFit, null, deviceAddress));
+        BleUnclaimDeviceObservable observable = spy(new BleUnclaimDeviceObservable(rxFit, null, deviceAddress, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -340,7 +339,7 @@ public class RxFitTest {
     public void BleUnclaimDeviceObservable_BleDevice_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         BleDevice bleDevice = Mockito.mock(BleDevice.class);
-        BleUnclaimDeviceObservable observable = spy(new BleUnclaimDeviceObservable(rxFit, bleDevice, null));
+        BleUnclaimDeviceObservable observable = spy(new BleUnclaimDeviceObservable(rxFit, bleDevice, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -356,7 +355,7 @@ public class RxFitTest {
     public void BleUnclaimDeviceObservable_DeviceAddress_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         String deviceAddress = "deviceAddress";
-        BleUnclaimDeviceObservable observable = spy(new BleUnclaimDeviceObservable(rxFit, null, deviceAddress));
+        BleUnclaimDeviceObservable observable = spy(new BleUnclaimDeviceObservable(rxFit, null, deviceAddress, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -373,7 +372,7 @@ public class RxFitTest {
     @Test
     public void BleListClaimedDevicesObservable_WithDataType_Success() {
         TestSubscriber<List<BleDevice>> sub = new TestSubscriber<>();
-        BleListClaimedDevicesObservable observable = spy(new BleListClaimedDevicesObservable(rxFit, dataType));
+        BleListClaimedDevicesObservable observable = spy(new BleListClaimedDevicesObservable(rxFit, dataType, null, null));
 
         BleDevicesResult bleDevicesResult = Mockito.mock(BleDevicesResult.class);
 
@@ -396,7 +395,7 @@ public class RxFitTest {
     @Test
     public void BleListClaimedDevicesObservable_WithDataType_StatusException() {
         TestSubscriber<List<BleDevice>> sub = new TestSubscriber<>();
-        BleListClaimedDevicesObservable observable = spy(new BleListClaimedDevicesObservable(rxFit, dataType));
+        BleListClaimedDevicesObservable observable = spy(new BleListClaimedDevicesObservable(rxFit, dataType, null, null));
 
         BleDevicesResult bleDevicesResult = Mockito.mock(BleDevicesResult.class);
 
@@ -419,7 +418,7 @@ public class RxFitTest {
     @Test
     public void BleListClaimedDevicesObservable_Success() {
         TestSubscriber<List<BleDevice>> sub = new TestSubscriber<>();
-        BleListClaimedDevicesObservable observable = spy(new BleListClaimedDevicesObservable(rxFit, null));
+        BleListClaimedDevicesObservable observable = spy(new BleListClaimedDevicesObservable(rxFit, null, null, null));
 
         BleDevicesResult bleDevicesResult = Mockito.mock(BleDevicesResult.class);
 
@@ -442,7 +441,7 @@ public class RxFitTest {
     @Test
     public void BleListClaimedDevicesObservable_StatusException() {
         TestSubscriber<List<BleDevice>> sub = new TestSubscriber<>();
-        BleListClaimedDevicesObservable observable = spy(new BleListClaimedDevicesObservable(rxFit, null));
+        BleListClaimedDevicesObservable observable = spy(new BleListClaimedDevicesObservable(rxFit, null, null, null));
 
         BleDevicesResult bleDevicesResult = Mockito.mock(BleDevicesResult.class);
 
@@ -468,7 +467,7 @@ public class RxFitTest {
     public void BleStartScanObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         StartBleScanRequest startBleScanRequest = Mockito.mock(StartBleScanRequest.class);
-        BleStartScanObservable observable = spy(new BleStartScanObservable(rxFit, startBleScanRequest));
+        BleStartScanObservable observable = spy(new BleStartScanObservable(rxFit, startBleScanRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -485,7 +484,7 @@ public class RxFitTest {
     public void BleStartScanObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         StartBleScanRequest startBleScanRequest = Mockito.mock(StartBleScanRequest.class);
-        BleStartScanObservable observable = spy(new BleStartScanObservable(rxFit, startBleScanRequest));
+        BleStartScanObservable observable = spy(new BleStartScanObservable(rxFit, startBleScanRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -506,7 +505,7 @@ public class RxFitTest {
         PowerMockito.doThrow(new SecurityException("Missing Bluetooth Admin permission")).when(bleApi).startBleScan(Matchers.any(GoogleApiClient.class), Matchers.any(StartBleScanRequest.class));
 
         StartBleScanRequest startBleScanRequest = Mockito.mock(StartBleScanRequest.class);
-        BleStartScanObservable observable = spy(new BleStartScanObservable(rxFit, startBleScanRequest));
+        BleStartScanObservable observable = spy(new BleStartScanObservable(rxFit, startBleScanRequest, null, null));
 
         setupBaseObservableSuccess(observable);
         Observable.create(observable).subscribe(sub);
@@ -520,7 +519,7 @@ public class RxFitTest {
     public void BleStopScanObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         BleScanCallback bleScanCallback = Mockito.mock(BleScanCallback.class);
-        BleStopScanObservable observable = spy(new BleStopScanObservable(rxFit, bleScanCallback));
+        BleStopScanObservable observable = spy(new BleStopScanObservable(rxFit, bleScanCallback, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -537,7 +536,7 @@ public class RxFitTest {
     public void BleStopScanObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         BleScanCallback bleScanCallback = Mockito.mock(BleScanCallback.class);
-        BleStopScanObservable observable = spy(new BleStopScanObservable(rxFit, bleScanCallback));
+        BleStopScanObservable observable = spy(new BleStopScanObservable(rxFit, bleScanCallback, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -562,7 +561,7 @@ public class RxFitTest {
         TestSubscriber<DataType> sub = new TestSubscriber<>();
         DataTypeCreateRequest dataTypeCreateRequest = Mockito.mock(DataTypeCreateRequest.class);
         DataTypeResult dataTypeResult = Mockito.mock(DataTypeResult.class);
-        ConfigCreateCustomDataTypeObservable observable = spy(new ConfigCreateCustomDataTypeObservable(rxFit, dataTypeCreateRequest));
+        ConfigCreateCustomDataTypeObservable observable = spy(new ConfigCreateCustomDataTypeObservable(rxFit, dataTypeCreateRequest, null, null));
 
         setPendingResultValue(dataTypeResult);
         when(dataTypeResult.getStatus()).thenReturn(status);
@@ -581,7 +580,7 @@ public class RxFitTest {
         TestSubscriber<DataType> sub = new TestSubscriber<>();
         DataTypeCreateRequest dataTypeCreateRequest = Mockito.mock(DataTypeCreateRequest.class);
         DataTypeResult dataTypeResult = Mockito.mock(DataTypeResult.class);
-        ConfigCreateCustomDataTypeObservable observable = spy(new ConfigCreateCustomDataTypeObservable(rxFit, dataTypeCreateRequest));
+        ConfigCreateCustomDataTypeObservable observable = spy(new ConfigCreateCustomDataTypeObservable(rxFit, dataTypeCreateRequest, null, null));
 
         setPendingResultValue(dataTypeResult);
         when(dataTypeResult.getStatus()).thenReturn(status);
@@ -600,7 +599,7 @@ public class RxFitTest {
     @Test
     public void ConfigDisableFitObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        ConfigDisableFitObservable observable = spy(new ConfigDisableFitObservable(rxFit));
+        ConfigDisableFitObservable observable = spy(new ConfigDisableFitObservable(rxFit, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -615,7 +614,7 @@ public class RxFitTest {
     @Test
     public void ConfigDisableFitObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        ConfigDisableFitObservable observable = spy(new ConfigDisableFitObservable(rxFit));
+        ConfigDisableFitObservable observable = spy(new ConfigDisableFitObservable(rxFit, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -634,7 +633,7 @@ public class RxFitTest {
         TestSubscriber<DataType> sub = new TestSubscriber<>();
         String dataTypeName = "dataTypeName";
         DataTypeResult dataTypeResult = Mockito.mock(DataTypeResult.class);
-        ConfigReadDataTypeObservable observable = spy(new ConfigReadDataTypeObservable(rxFit, dataTypeName));
+        ConfigReadDataTypeObservable observable = spy(new ConfigReadDataTypeObservable(rxFit, dataTypeName, null, null));
 
         setPendingResultValue(dataTypeResult);
         when(dataTypeResult.getStatus()).thenReturn(status);
@@ -653,7 +652,7 @@ public class RxFitTest {
         TestSubscriber<DataType> sub = new TestSubscriber<>();
         String dataTypeName = "dataTypeName";
         DataTypeResult dataTypeResult = Mockito.mock(DataTypeResult.class);
-        ConfigReadDataTypeObservable observable = spy(new ConfigReadDataTypeObservable(rxFit, dataTypeName));
+        ConfigReadDataTypeObservable observable = spy(new ConfigReadDataTypeObservable(rxFit, dataTypeName, null, null));
 
         setPendingResultValue(dataTypeResult);
         when(dataTypeResult.getStatus()).thenReturn(status);
@@ -677,7 +676,7 @@ public class RxFitTest {
     public void HistoryDeleteDataObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         DataDeleteRequest dataDeleteRequest = Mockito.mock(DataDeleteRequest.class);
-        HistoryDeleteDataObservable observable = spy(new HistoryDeleteDataObservable(rxFit, dataDeleteRequest));
+        HistoryDeleteDataObservable observable = spy(new HistoryDeleteDataObservable(rxFit, dataDeleteRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -693,7 +692,7 @@ public class RxFitTest {
     public void HistoryDeleteDataObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         DataDeleteRequest dataDeleteRequest = Mockito.mock(DataDeleteRequest.class);
-        HistoryDeleteDataObservable observable = spy(new HistoryDeleteDataObservable(rxFit, dataDeleteRequest));
+        HistoryDeleteDataObservable observable = spy(new HistoryDeleteDataObservable(rxFit, dataDeleteRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -710,7 +709,7 @@ public class RxFitTest {
     @Test
     public void HistoryInsertDataObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        HistoryInsertDataObservable observable = spy(new HistoryInsertDataObservable(rxFit, dataSet));
+        HistoryInsertDataObservable observable = spy(new HistoryInsertDataObservable(rxFit, dataSet, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -725,7 +724,7 @@ public class RxFitTest {
     @Test
     public void HistoryInsertDataObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        HistoryInsertDataObservable observable = spy(new HistoryInsertDataObservable(rxFit, dataSet));
+        HistoryInsertDataObservable observable = spy(new HistoryInsertDataObservable(rxFit, dataSet, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -743,7 +742,7 @@ public class RxFitTest {
     public void HistoryReadDailyTotalObservable_Success() {
         TestSubscriber<DataSet> sub = new TestSubscriber<>();
         DailyTotalResult dailyTotalResult = Mockito.mock(DailyTotalResult.class);
-        HistoryReadDailyTotalObservable observable = spy(new HistoryReadDailyTotalObservable(rxFit, dataType));
+        HistoryReadDailyTotalObservable observable = spy(new HistoryReadDailyTotalObservable(rxFit, dataType, null, null));
 
         setPendingResultValue(dailyTotalResult);
         when(dailyTotalResult.getStatus()).thenReturn(status);
@@ -761,7 +760,7 @@ public class RxFitTest {
     public void HistoryReadDailyTotalObservable_StatusException() {
         TestSubscriber<DataSet> sub = new TestSubscriber<>();
         DailyTotalResult dailyTotalResult = Mockito.mock(DailyTotalResult.class);
-        HistoryReadDailyTotalObservable observable = spy(new HistoryReadDailyTotalObservable(rxFit, dataType));
+        HistoryReadDailyTotalObservable observable = spy(new HistoryReadDailyTotalObservable(rxFit, dataType, null, null));
 
         setPendingResultValue(dailyTotalResult);
         when(dailyTotalResult.getStatus()).thenReturn(status);
@@ -782,7 +781,7 @@ public class RxFitTest {
         TestSubscriber<DataReadResult> sub = new TestSubscriber<>();
         DataReadRequest dataReadRequest = Mockito.mock(DataReadRequest.class);
         DataReadResult dataReadResult = Mockito.mock(DataReadResult.class);
-        HistoryReadDataObservable observable = spy(new HistoryReadDataObservable(rxFit, dataReadRequest));
+        HistoryReadDataObservable observable = spy(new HistoryReadDataObservable(rxFit, dataReadRequest, null, null));
 
         setPendingResultValue(dataReadResult);
         when(dataReadResult.getStatus()).thenReturn(status);
@@ -800,7 +799,7 @@ public class RxFitTest {
         TestSubscriber<DataReadResult> sub = new TestSubscriber<>();
         DataReadRequest dataReadRequest = Mockito.mock(DataReadRequest.class);
         DataReadResult dataReadResult = Mockito.mock(DataReadResult.class);
-        HistoryReadDataObservable observable = spy(new HistoryReadDataObservable(rxFit, dataReadRequest));
+        HistoryReadDataObservable observable = spy(new HistoryReadDataObservable(rxFit, dataReadRequest, null, null));
 
         setPendingResultValue(dataReadResult);
         when(dataReadResult.getStatus()).thenReturn(status);
@@ -819,7 +818,7 @@ public class RxFitTest {
     public void HistoryUpdateDataObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         DataUpdateRequest dataUpdateRequest = Mockito.mock(DataUpdateRequest.class);
-        HistoryUpdateDataObservable observable = spy(new HistoryUpdateDataObservable(rxFit, dataUpdateRequest));
+        HistoryUpdateDataObservable observable = spy(new HistoryUpdateDataObservable(rxFit, dataUpdateRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -835,7 +834,7 @@ public class RxFitTest {
     public void HistoryUpdateDataObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         DataUpdateRequest dataUpdateRequest = Mockito.mock(DataUpdateRequest.class);
-        HistoryUpdateDataObservable observable = spy(new HistoryUpdateDataObservable(rxFit, dataUpdateRequest));
+        HistoryUpdateDataObservable observable = spy(new HistoryUpdateDataObservable(rxFit, dataUpdateRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -857,7 +856,7 @@ public class RxFitTest {
     @Test
     public void RecordingListSubscriptionsObservable_Success() {
         TestSubscriber<List<Subscription>> sub = new TestSubscriber<>();
-        RecordingListSubscriptionsObservable observable = spy(new RecordingListSubscriptionsObservable(rxFit, null));
+        RecordingListSubscriptionsObservable observable = spy(new RecordingListSubscriptionsObservable(rxFit, null, null, null));
 
         ListSubscriptionsResult listSubscriptionsResult = Mockito.mock(ListSubscriptionsResult.class);
 
@@ -880,7 +879,7 @@ public class RxFitTest {
     @Test
     public void RecordingListSubscriptionsObservable_StatusException() {
         TestSubscriber<List<Subscription>> sub = new TestSubscriber<>();
-        RecordingListSubscriptionsObservable observable = spy(new RecordingListSubscriptionsObservable(rxFit, null));
+        RecordingListSubscriptionsObservable observable = spy(new RecordingListSubscriptionsObservable(rxFit, null, null, null));
 
         ListSubscriptionsResult listSubscriptionsResult = Mockito.mock(ListSubscriptionsResult.class);
 
@@ -903,7 +902,7 @@ public class RxFitTest {
     @Test
     public void RecordingListSubscriptionsObservable_WithDataType_Success() {
         TestSubscriber<List<Subscription>> sub = new TestSubscriber<>();
-        RecordingListSubscriptionsObservable observable = spy(new RecordingListSubscriptionsObservable(rxFit, dataType));
+        RecordingListSubscriptionsObservable observable = spy(new RecordingListSubscriptionsObservable(rxFit, dataType, null, null));
 
         ListSubscriptionsResult listSubscriptionsResult = Mockito.mock(ListSubscriptionsResult.class);
 
@@ -926,7 +925,7 @@ public class RxFitTest {
     @Test
     public void RecordingListSubscriptionsObservable_WithDataType_StatusException() {
         TestSubscriber<List<Subscription>> sub = new TestSubscriber<>();
-        RecordingListSubscriptionsObservable observable = spy(new RecordingListSubscriptionsObservable(rxFit, dataType));
+        RecordingListSubscriptionsObservable observable = spy(new RecordingListSubscriptionsObservable(rxFit, dataType, null, null));
 
         ListSubscriptionsResult listSubscriptionsResult = Mockito.mock(ListSubscriptionsResult.class);
 
@@ -951,7 +950,7 @@ public class RxFitTest {
     @Test
     public void RecordingSubscribeObservable_DataType_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingSubscribeObservable observable = spy(new RecordingSubscribeObservable(rxFit, null, dataType));
+        RecordingSubscribeObservable observable = spy(new RecordingSubscribeObservable(rxFit, null, dataType, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -967,7 +966,7 @@ public class RxFitTest {
     @Test
     public void RecordingSubscribeObservable_DataType_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingSubscribeObservable observable = spy(new RecordingSubscribeObservable(rxFit, null, dataType));
+        RecordingSubscribeObservable observable = spy(new RecordingSubscribeObservable(rxFit, null, dataType, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -982,7 +981,7 @@ public class RxFitTest {
     @Test
     public void RecordingSubscribeObservable_DataSource_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingSubscribeObservable observable = spy(new RecordingSubscribeObservable(rxFit, dataSource, null));
+        RecordingSubscribeObservable observable = spy(new RecordingSubscribeObservable(rxFit, dataSource, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -998,7 +997,7 @@ public class RxFitTest {
     @Test
     public void RecordingSubscribeObservable_DataSource_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingSubscribeObservable observable = spy(new RecordingSubscribeObservable(rxFit, dataSource, null));
+        RecordingSubscribeObservable observable = spy(new RecordingSubscribeObservable(rxFit, dataSource, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1015,7 +1014,7 @@ public class RxFitTest {
     @Test
     public void RecordingUnsubscribeObservable_DataType_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, null, dataType, null));
+        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, null, dataType, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1031,7 +1030,7 @@ public class RxFitTest {
     @Test
     public void RecordingUnsubscribeObservable_DataType_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, null, dataType, null));
+        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, null, dataType, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1046,7 +1045,7 @@ public class RxFitTest {
     @Test
     public void RecordingUnsubscribeObservable_DataSource_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, dataSource, null, null));
+        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, dataSource, null, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1061,7 +1060,7 @@ public class RxFitTest {
     @Test
     public void RecordingUnsubscribeObservable_DataSource_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, dataSource, null, null));
+        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, dataSource, null, null, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1076,7 +1075,7 @@ public class RxFitTest {
     @Test
     public void RecordingUnsubscribeObservable_Subscription_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, null, null, subscription));
+        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, null, null, subscription, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1091,7 +1090,7 @@ public class RxFitTest {
     @Test
     public void RecordingUnsubscribeObservable_Subscription_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, null, null, subscription));
+        RecordingUnsubscribeObservable observable = spy(new RecordingUnsubscribeObservable(rxFit, null, null, subscription, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1114,7 +1113,7 @@ public class RxFitTest {
     public void SensorsAddDataPointIntentObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
-        SensorsAddDataPointIntentObservable observable = spy(new SensorsAddDataPointIntentObservable(rxFit, sensorRequest, pendingIntent));
+        SensorsAddDataPointIntentObservable observable = spy(new SensorsAddDataPointIntentObservable(rxFit, sensorRequest, pendingIntent, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1130,7 +1129,7 @@ public class RxFitTest {
     public void SensorsAddDataPointIntentObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
-        SensorsAddDataPointIntentObservable observable = spy(new SensorsAddDataPointIntentObservable(rxFit, sensorRequest, pendingIntent));
+        SensorsAddDataPointIntentObservable observable = spy(new SensorsAddDataPointIntentObservable(rxFit, sensorRequest, pendingIntent, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1149,7 +1148,7 @@ public class RxFitTest {
     public void SensorsRemoveDataPointIntentObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
-        SensorsRemoveDataPointIntentObservable observable = spy(new SensorsRemoveDataPointIntentObservable(rxFit, pendingIntent));
+        SensorsRemoveDataPointIntentObservable observable = spy(new SensorsRemoveDataPointIntentObservable(rxFit, pendingIntent, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1165,7 +1164,7 @@ public class RxFitTest {
     public void SensorsRemoveDataPointIntentObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
-        SensorsRemoveDataPointIntentObservable observable = spy(new SensorsRemoveDataPointIntentObservable(rxFit, pendingIntent));
+        SensorsRemoveDataPointIntentObservable observable = spy(new SensorsRemoveDataPointIntentObservable(rxFit, pendingIntent, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1183,7 +1182,7 @@ public class RxFitTest {
     public void SensorsDataPointObservable_Success() {
         TestSubscriber<DataPoint> sub = new TestSubscriber<>();
         DataPoint dataPoint = Mockito.mock(DataPoint.class);
-        SensorsDataPointObservable observable = spy(new SensorsDataPointObservable(rxFit, sensorRequest));
+        SensorsDataPointObservable observable = spy(new SensorsDataPointObservable(rxFit, sensorRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1206,7 +1205,7 @@ public class RxFitTest {
     @Test
     public void SensorsDataPointObservable_StatusException() {
         TestSubscriber<DataPoint> sub = new TestSubscriber<>();
-        SensorsDataPointObservable observable = spy(new SensorsDataPointObservable(rxFit, sensorRequest));
+        SensorsDataPointObservable observable = spy(new SensorsDataPointObservable(rxFit, sensorRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1225,7 +1224,7 @@ public class RxFitTest {
         TestSubscriber<List<DataSource>> sub = new TestSubscriber<>();
         DataSourcesRequest dataSourcesRequest = Mockito.mock(DataSourcesRequest.class);
         DataSourcesResult dataSourcesResult = Mockito.mock(DataSourcesResult.class);
-        SensorsFindDataSourcesObservable observable = spy(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, null));
+        SensorsFindDataSourcesObservable observable = spy(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, null, null, null));
 
         List<DataSource> dataSourceList = new ArrayList<>();
         dataSourceList.add(dataSource);
@@ -1248,7 +1247,7 @@ public class RxFitTest {
         TestSubscriber<List<DataSource>> sub = new TestSubscriber<>();
         DataSourcesRequest dataSourcesRequest = Mockito.mock(DataSourcesRequest.class);
         DataSourcesResult dataSourcesResult = Mockito.mock(DataSourcesResult.class);
-        SensorsFindDataSourcesObservable observable = spy(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, null));
+        SensorsFindDataSourcesObservable observable = spy(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, null, null, null));
 
         List<DataSource> dataSourceList = new ArrayList<>();
         dataSourceList.add(dataSource);
@@ -1271,7 +1270,7 @@ public class RxFitTest {
         TestSubscriber<List<DataSource>> sub = new TestSubscriber<>();
         DataSourcesRequest dataSourcesRequest = Mockito.mock(DataSourcesRequest.class);
         DataSourcesResult dataSourcesResult = Mockito.mock(DataSourcesResult.class);
-        SensorsFindDataSourcesObservable observable = spy(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, dataType));
+        SensorsFindDataSourcesObservable observable = spy(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, dataType, null, null));
 
         List<DataSource> dataSourceList = new ArrayList<>();
         dataSourceList.add(dataSource);
@@ -1294,7 +1293,7 @@ public class RxFitTest {
         TestSubscriber<List<DataSource>> sub = new TestSubscriber<>();
         DataSourcesRequest dataSourcesRequest = Mockito.mock(DataSourcesRequest.class);
         DataSourcesResult dataSourcesResult = Mockito.mock(DataSourcesResult.class);
-        SensorsFindDataSourcesObservable observable = spy(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, dataType));
+        SensorsFindDataSourcesObservable observable = spy(new SensorsFindDataSourcesObservable(rxFit, dataSourcesRequest, dataType, null, null));
 
         List<DataSource> dataSourceList = new ArrayList<>();
         dataSourceList.add(dataSource);
@@ -1323,7 +1322,7 @@ public class RxFitTest {
     public void SessionInsertObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         SessionInsertRequest sessionInsertRequest = Mockito.mock(SessionInsertRequest.class);
-        SessionInsertObservable observable = spy(new SessionInsertObservable(rxFit, sessionInsertRequest));
+        SessionInsertObservable observable = spy(new SessionInsertObservable(rxFit, sessionInsertRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1339,7 +1338,7 @@ public class RxFitTest {
     public void SessionInsertObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         SessionInsertRequest sessionInsertRequest = Mockito.mock(SessionInsertRequest.class);
-        SessionInsertObservable observable = spy(new SessionInsertObservable(rxFit, sessionInsertRequest));
+        SessionInsertObservable observable = spy(new SessionInsertObservable(rxFit, sessionInsertRequest, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1357,7 +1356,7 @@ public class RxFitTest {
     public void SessionRegisterObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
-        SessionRegisterObservable observable = spy(new SessionRegisterObservable(rxFit, pendingIntent));
+        SessionRegisterObservable observable = spy(new SessionRegisterObservable(rxFit, pendingIntent, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1373,7 +1372,7 @@ public class RxFitTest {
     public void SessionRegisterObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
-        SessionRegisterObservable observable = spy(new SessionRegisterObservable(rxFit, pendingIntent));
+        SessionRegisterObservable observable = spy(new SessionRegisterObservable(rxFit, pendingIntent, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1391,7 +1390,7 @@ public class RxFitTest {
     public void SessionUnregisterObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
-        SessionUnregisterObservable observable = spy(new SessionUnregisterObservable(rxFit, pendingIntent));
+        SessionUnregisterObservable observable = spy(new SessionUnregisterObservable(rxFit, pendingIntent, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1407,7 +1406,7 @@ public class RxFitTest {
     public void SessionUnregisterObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
-        SessionUnregisterObservable observable = spy(new SessionUnregisterObservable(rxFit, pendingIntent));
+        SessionUnregisterObservable observable = spy(new SessionUnregisterObservable(rxFit, pendingIntent, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1425,7 +1424,7 @@ public class RxFitTest {
     public void SessionStartObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
         Session session = Mockito.mock(Session.class);
-        SessionStartObservable observable = spy(new SessionStartObservable(rxFit, session));
+        SessionStartObservable observable = spy(new SessionStartObservable(rxFit, session, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(true);
@@ -1440,7 +1439,7 @@ public class RxFitTest {
     @Test
     public void SessionStartObservable_StatusException() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
-        SessionStartObservable observable = spy(new SessionStartObservable(rxFit, session));
+        SessionStartObservable observable = spy(new SessionStartObservable(rxFit, session, null, null));
 
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
@@ -1459,7 +1458,7 @@ public class RxFitTest {
         TestSubscriber<List<Session>> sub = new TestSubscriber<>();
         String identifier = "identifier";
         SessionStopResult sessionStopResult = Mockito.mock(SessionStopResult.class);
-        SessionStopObservable observable = spy(new SessionStopObservable(rxFit, identifier));
+        SessionStopObservable observable = spy(new SessionStopObservable(rxFit, identifier, null, null));
 
         List<Session> sessionList = new ArrayList<>();
         sessionList.add(session);
@@ -1482,7 +1481,7 @@ public class RxFitTest {
         TestSubscriber<List<Session>> sub = new TestSubscriber<>();
         String identifier = "identifier";
         SessionStopResult sessionStopResult = Mockito.mock(SessionStopResult.class);
-        SessionStopObservable observable = spy(new SessionStopObservable(rxFit, identifier));
+        SessionStopObservable observable = spy(new SessionStopObservable(rxFit, identifier, null, null));
 
         List<Session> sessionList = new ArrayList<>();
         sessionList.add(session);
@@ -1507,7 +1506,7 @@ public class RxFitTest {
         TestSubscriber<SessionReadResult> sub = new TestSubscriber<>();
         SessionReadRequest sessionReadRequest = Mockito.mock(SessionReadRequest.class);
         SessionReadResult sessionReadResult = Mockito.mock(SessionReadResult.class);
-        SessionReadObservable observable = spy(new SessionReadObservable(rxFit, sessionReadRequest));
+        SessionReadObservable observable = spy(new SessionReadObservable(rxFit, sessionReadRequest, null, null));
 
         setPendingResultValue(sessionReadResult);
         when(sessionReadResult.getStatus()).thenReturn(status);
@@ -1525,7 +1524,7 @@ public class RxFitTest {
         TestSubscriber<SessionReadResult> sub = new TestSubscriber<>();
         SessionReadRequest sessionReadRequest = Mockito.mock(SessionReadRequest.class);
         SessionReadResult sessionReadResult = Mockito.mock(SessionReadResult.class);
-        SessionReadObservable observable = spy(new SessionReadObservable(rxFit, sessionReadRequest));
+        SessionReadObservable observable = spy(new SessionReadObservable(rxFit, sessionReadRequest, null, null));
 
         setPendingResultValue(sessionReadResult);
         when(sessionReadResult.getStatus()).thenReturn(status);

@@ -9,25 +9,22 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.result.DailyTotalResult;
 
-import rx.Observable;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observer;
 
 public class HistoryReadDailyTotalObservable extends BaseObservable<DataSet> {
 
     private final DataType dataType;
 
-    static Observable<DataSet> create(@NonNull RxFit rxFit, @NonNull DataType dataType) {
-        return Observable.create(new HistoryReadDailyTotalObservable(rxFit, dataType));
-    }
-
-    HistoryReadDailyTotalObservable(RxFit rxFit, DataType dataType) {
-        super(rxFit);
+    HistoryReadDailyTotalObservable(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.dataType = dataType;
     }
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Observer<? super DataSet> observer) {
-        Fitness.HistoryApi.readDailyTotal(apiClient, dataType).setResultCallback(new ResultCallback<DailyTotalResult>() {
+        setupFitnessPendingResult(Fitness.HistoryApi.readDailyTotal(apiClient, dataType), new ResultCallback<DailyTotalResult>() {
             @Override
             public void onResult(@NonNull DailyTotalResult dailyTotalResult) {
                 if (!dailyTotalResult.getStatus().isSuccess()) {

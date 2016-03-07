@@ -1,30 +1,25 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.request.DataUpdateRequest;
 
-import rx.Observable;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observer;
 
 public class HistoryUpdateDataObservable extends BaseObservable<Status> {
 
     private final DataUpdateRequest dataUpdateRequest;
 
-    static Observable<Status> create(@NonNull RxFit rxFit, @NonNull DataUpdateRequest dataUpdateRequest) {
-        return Observable.create(new HistoryUpdateDataObservable(rxFit, dataUpdateRequest));
-    }
-
-    HistoryUpdateDataObservable(RxFit rxFit, DataUpdateRequest dataUpdateRequest) {
-        super(rxFit);
+    HistoryUpdateDataObservable(RxFit rxFit, DataUpdateRequest dataUpdateRequest, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.dataUpdateRequest = dataUpdateRequest;
     }
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Observer<? super Status> observer) {
-        Fitness.HistoryApi.updateData(apiClient, dataUpdateRequest).setResultCallback(new StatusResultCallBack(observer));
+        setupFitnessPendingResult(Fitness.HistoryApi.updateData(apiClient, dataUpdateRequest), new StatusResultCallBack(observer));
     }
 }

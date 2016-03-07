@@ -16,12 +16,14 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.patloew.rxfit.RxFit;
+import com.patloew.rxfit.StatusException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         RxFit.init(this, new Api[] { Fitness.SESSIONS_API, Fitness.HISTORY_API }, new Scope[] { new Scope(Scopes.FITNESS_ACTIVITY_READ) });
+        RxFit.setDefaultTimeout(15, TimeUnit.SECONDS);
 
         getFitnessData();
     }
@@ -73,15 +76,21 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
 
-        DataReadRequest dataReadRequest = new DataReadRequest.Builder()
+        DataReadRequest.Builder dataReadRequestBuilder = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .bucketBySession(1, TimeUnit.MINUTES)
                 // 3 months back
-                .setTimeRange(System.currentTimeMillis() - 7776000000L, System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .build();
+                .setTimeRange(System.currentTimeMillis() - 7776000000L, System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 
-        subscription = RxFit.History.read(dataReadRequest)
+        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
+        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
+
+        // First, request all data from the server. If there is an error (e.g. timeout),
+        // switch to normal request
+        subscription = RxFit.History.read(dataReadRequestServer)
+                .doOnError(throwable -> { if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) Log.e("MainActivity", "Timeout on server query request"); })
+                .onExceptionResumeNext(RxFit.History.read(dataReadRequest))
                 .flatMap(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

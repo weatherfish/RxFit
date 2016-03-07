@@ -1,14 +1,13 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.BleDevice;
 
-import rx.Observable;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observer;
 
 public class BleUnclaimDeviceObservable extends BaseObservable<Status> {
@@ -16,16 +15,8 @@ public class BleUnclaimDeviceObservable extends BaseObservable<Status> {
     private final BleDevice bleDevice;
     private final String deviceAddress;
 
-    static Observable<Status> create(@NonNull RxFit rxFit, @NonNull BleDevice bleDevice) {
-        return Observable.create(new BleUnclaimDeviceObservable(rxFit, bleDevice, null));
-    }
-
-    static Observable<Status> create(@NonNull RxFit rxFit, @NonNull String deviceAddress) {
-        return Observable.create(new BleUnclaimDeviceObservable(rxFit, null, deviceAddress));
-    }
-
-    BleUnclaimDeviceObservable(RxFit rxFit, BleDevice bleDevice, String deviceAddress) {
-        super(rxFit);
+    BleUnclaimDeviceObservable(RxFit rxFit, BleDevice bleDevice, String deviceAddress, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.bleDevice = bleDevice;
         this.deviceAddress = deviceAddress;
     }
@@ -35,9 +26,9 @@ public class BleUnclaimDeviceObservable extends BaseObservable<Status> {
         ResultCallback<Status> resultCallback = new StatusResultCallBack(observer);
 
         if(bleDevice != null) {
-            Fitness.BleApi.unclaimBleDevice(apiClient, bleDevice).setResultCallback(resultCallback);
+            setupFitnessPendingResult(Fitness.BleApi.unclaimBleDevice(apiClient, bleDevice), resultCallback);
         } else {
-            Fitness.BleApi.unclaimBleDevice(apiClient, deviceAddress).setResultCallback(resultCallback);
+            setupFitnessPendingResult(Fitness.BleApi.unclaimBleDevice(apiClient, deviceAddress), resultCallback);
         }
     }
 }

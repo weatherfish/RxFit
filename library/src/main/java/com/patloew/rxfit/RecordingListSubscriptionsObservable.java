@@ -10,24 +10,16 @@ import com.google.android.gms.fitness.data.Subscription;
 import com.google.android.gms.fitness.result.ListSubscriptionsResult;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
 import rx.Observer;
 
 public class RecordingListSubscriptionsObservable extends BaseObservable<List<Subscription>> {
 
     private final DataType dataType;
 
-    static Observable<List<Subscription>> create(@NonNull RxFit rxFit) {
-        return Observable.create(new RecordingListSubscriptionsObservable(rxFit, null));
-    }
-
-    static Observable<List<Subscription>> create(@NonNull RxFit rxFit, DataType dataType) {
-        return Observable.create(new RecordingListSubscriptionsObservable(rxFit, dataType));
-    }
-
-    RecordingListSubscriptionsObservable(RxFit rxFit, DataType dataType) {
-        super(rxFit);
+    RecordingListSubscriptionsObservable(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.dataType = dataType;
     }
 
@@ -46,9 +38,9 @@ public class RecordingListSubscriptionsObservable extends BaseObservable<List<Su
         };
 
         if(dataType == null) {
-            Fitness.RecordingApi.listSubscriptions(apiClient).setResultCallback(resultCallback);
+            setupFitnessPendingResult(Fitness.RecordingApi.listSubscriptions(apiClient), resultCallback);
         } else {
-            Fitness.RecordingApi.listSubscriptions(apiClient, dataType).setResultCallback(resultCallback);
+            setupFitnessPendingResult(Fitness.RecordingApi.listSubscriptions(apiClient, dataType), resultCallback);
         }
     }
 }

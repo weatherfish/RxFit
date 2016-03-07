@@ -10,7 +10,8 @@ import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
 
-import rx.Observable;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observer;
 
 public class SensorsDataPointObservable extends BaseObservable<DataPoint> {
@@ -18,12 +19,8 @@ public class SensorsDataPointObservable extends BaseObservable<DataPoint> {
     private final SensorRequest sensorRequest;
     private OnDataPointListener dataPointListener = null;
 
-    static Observable<DataPoint> create(@NonNull RxFit rxFit, @NonNull SensorRequest sensorRequest) {
-        return Observable.create(new SensorsDataPointObservable(rxFit, sensorRequest));
-    }
-
-    SensorsDataPointObservable(RxFit rxFit, SensorRequest sensorRequest) {
-        super(rxFit);
+    SensorsDataPointObservable(RxFit rxFit, SensorRequest sensorRequest, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.sensorRequest = sensorRequest;
     }
 
@@ -36,7 +33,7 @@ public class SensorsDataPointObservable extends BaseObservable<DataPoint> {
             }
         };
 
-        Fitness.SensorsApi.add(apiClient, sensorRequest, dataPointListener).setResultCallback(new ResultCallback<Status>() {
+        setupFitnessPendingResult(Fitness.SensorsApi.add(apiClient, sensorRequest, dataPointListener), new ResultCallback<Status>() {
             @Override
             public void onResult(@NonNull Status status) {
                 if (!status.isSuccess()) {

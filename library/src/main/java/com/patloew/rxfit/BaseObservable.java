@@ -9,10 +9,14 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Observer;
@@ -49,11 +53,22 @@ public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
     private GoogleApiClient apiClient;
     Subscriber<? super T> subscriber;
 
-    protected BaseObservable(@NonNull RxFit rxFit) {
+    protected final Long timeoutTime;
+    protected final TimeUnit timeoutUnit;
+
+    protected BaseObservable(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         this.ctx = rxFit.getContext();
         this.services = rxFit.getApis();
         this.scopes = rxFit.getScopes();
         handleResolution = true;
+
+        if(timeout != null && timeUnit != null) {
+            this.timeoutTime = RxFit.getTimeout(timeout);
+            this.timeoutUnit = RxFit.getTimeoutUnit(timeUnit);
+        } else {
+            this.timeoutTime = RxFit.getTimeout(null);
+            this.timeoutUnit = RxFit.getTimeoutUnit(null);
+        }
     }
 
     protected BaseObservable(@NonNull Context ctx, @NonNull Api<? extends Api.ApiOptions.NotRequiredOptions>[] services, Scope[] scopes) {
@@ -61,6 +76,16 @@ public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
         this.services = services;
         this.scopes = scopes;
         handleResolution = false;
+        timeoutTime = null;
+        timeoutUnit = null;
+    }
+
+    protected <T extends Result> void setupFitnessPendingResult(PendingResult<T> pendingResult, ResultCallback<? super T> resultCallback) {
+        if(timeoutTime != null && timeoutUnit != null) {
+            pendingResult.setResultCallback(resultCallback, timeoutTime, timeoutUnit);
+        } else {
+            pendingResult.setResultCallback(resultCallback);
+        }
     }
 
     @Override

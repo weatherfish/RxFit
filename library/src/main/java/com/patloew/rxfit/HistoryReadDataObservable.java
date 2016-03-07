@@ -8,25 +8,22 @@ import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
 
-import rx.Observable;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observer;
 
 public class HistoryReadDataObservable extends BaseObservable<DataReadResult> {
 
     private final DataReadRequest dataReadRequest;
 
-    static Observable<DataReadResult> create(@NonNull RxFit rxFit, @NonNull DataReadRequest dataReadRequest) {
-        return Observable.create(new HistoryReadDataObservable(rxFit, dataReadRequest));
-    }
-
-    HistoryReadDataObservable(RxFit rxFit, DataReadRequest dataReadRequest) {
-        super(rxFit);
+    HistoryReadDataObservable(RxFit rxFit, DataReadRequest dataReadRequest, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
         this.dataReadRequest = dataReadRequest;
     }
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Observer<? super DataReadResult> observer) {
-        Fitness.HistoryApi.readData(apiClient, dataReadRequest).setResultCallback(new ResultCallback<DataReadResult>() {
+        setupFitnessPendingResult(Fitness.HistoryApi.readData(apiClient, dataReadRequest), new ResultCallback<DataReadResult>() {
             @Override
             public void onResult(@NonNull DataReadResult dataReadResult) {
                 if (!dataReadResult.getStatus().isSuccess()) {
