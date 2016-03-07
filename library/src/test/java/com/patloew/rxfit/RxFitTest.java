@@ -498,18 +498,20 @@ public class RxFitTest {
         assertError(sub, StatusException.class);
     }
 
+    @SuppressWarnings("MissingPermission")
     @Test
     public void BleStartScanObservable_PermissionRequiredException() throws Exception {
         TestSubscriber<Status> sub = new TestSubscriber<>();
 
-        PowerMockito.mockStatic(ContextCompat.class);
-        PowerMockito.doReturn(PackageManager.PERMISSION_DENIED).when(ContextCompat.class, "checkSelfPermission", Matchers.any(Context.class), Matchers.anyString());
+        PowerMockito.doThrow(new SecurityException("Missing Bluetooth Admin permission")).when(bleApi).startBleScan(Matchers.any(GoogleApiClient.class), Matchers.any(StartBleScanRequest.class));
 
         StartBleScanRequest startBleScanRequest = Mockito.mock(StartBleScanRequest.class);
-        //noinspection MissingPermission
-        BleStartScanObservable.create(rxFit, startBleScanRequest).subscribe(sub);
+        BleStartScanObservable observable = spy(new BleStartScanObservable(rxFit, startBleScanRequest));
 
-        assertError(sub, PermissionRequiredException.class);
+        setupBaseObservableSuccess(observable);
+        Observable.create(observable).subscribe(sub);
+
+        assertError(sub, SecurityException.class);
     }
 
     // BleStopScanObservable

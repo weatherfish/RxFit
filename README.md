@@ -1,6 +1,6 @@
 # Reactive Fit API Library for Android
 
-[![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=master)](https://travis-ci.org/patloew/RxFit)  [ ![Download](https://api.bintray.com/packages/patloew/maven/com.patloew.rxfit/images/download.svg) ](https://bintray.com/patloew/maven/com.patloew.rxfit/_latestVersion)
+[![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=master)](https://travis-ci.org/patloew/RxFit)  [ ![Download](https://api.bintray.com/packages/patloew/maven/com.patloew.rxfit/images/download.svg) ](https://bintray.com/patloew/maven/com.patloew.rxfit/_latestVersion) [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
 
 This library wraps the Fit API in [RxJava](https://github.com/ReactiveX/RxJava) Observables. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
 
@@ -38,7 +38,7 @@ The following Exceptions are thrown in the lib and provided via `onError()`:
 * `StatusException`: When the call to the Fit API was not successful.
 * `GoogleAPIConnectionException`: When connecting to the GoogleAPIClient was not successful and the resolution (if available) was also not successful (e.g. when the user does not authorize your app to use fitness data). Resolutions are not handled when using `GoogleAPIClientObservable`.
 * `GoogleAPIConnectionSuspendedException`: When the GoogleApiClient connection was suspended.
-* `PermissionRequiredException` or `SecurityException`: When you try to call a Fit API without proper permissions.
+* `SecurityException`: When you try to call a Fit API without proper permissions.
 
 # Sample
 
