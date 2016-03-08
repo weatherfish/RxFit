@@ -14,8 +14,10 @@ import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -44,17 +46,16 @@ import rx.subscriptions.Subscriptions;
  *
  */
 public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
-    private static final List<BaseObservable> observableList = new ArrayList<>();
+    private static final Set<BaseObservable> observableSet = new HashSet<>();
 
     private final Context ctx;
     private final Api<? extends Api.ApiOptions.NotRequiredOptions>[] services;
     private final Scope[] scopes;
     private final boolean handleResolution;
-    private GoogleApiClient apiClient;
-    Subscriber<? super T> subscriber;
+    private final Long timeoutTime;
+    private final TimeUnit timeoutUnit;
 
-    protected final Long timeoutTime;
-    protected final TimeUnit timeoutUnit;
+    private final HashMap<GoogleApiClient, Subscriber<? super T>> subscriptionInfoHashMap = new HashMap<>();
 
     protected BaseObservable(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         this.ctx = rxFit.getContext();
@@ -63,11 +64,11 @@ public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
         handleResolution = true;
 
         if(timeout != null && timeUnit != null) {
-            this.timeoutTime = RxFit.getTimeout(timeout);
-            this.timeoutUnit = RxFit.getTimeoutUnit(timeUnit);
+            this.timeoutTime = timeout;
+            this.timeoutUnit = timeUnit;
         } else {
-            this.timeoutTime = RxFit.getTimeout(null);
-            this.timeoutUnit = RxFit.getTimeoutUnit(null);
+            this.timeoutTime = RxFit.getDefaultTimeout();
+            this.timeoutUnit = RxFit.getDefaultTimeoutUnit();
         }
     }
 
@@ -80,7 +81,7 @@ public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
         timeoutUnit = null;
     }
 
-    protected <T extends Result> void setupFitnessPendingResult(PendingResult<T> pendingResult, ResultCallback<? super T> resultCallback) {
+    protected final <T extends Result> void setupFitnessPendingResult(PendingResult<T> pendingResult, ResultCallback<? super T> resultCallback) {
         if(timeoutTime != null && timeoutUnit != null) {
             pendingResult.setResultCallback(resultCallback, timeoutTime, timeoutUnit);
         } else {
@@ -89,10 +90,9 @@ public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
     }
 
     @Override
-    public void call(Subscriber<? super T> subscriber) {
-        this.subscriber = subscriber;
-
-        apiClient = createApiClient(subscriber);
+    public final void call(Subscriber<? super T> subscriber) {
+        final GoogleApiClient apiClient = createApiClient(subscriber);
+        subscriptionInfoHashMap.put(apiClient, subscriber);
 
         try {
             apiClient.connect();
@@ -107,12 +107,14 @@ public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
                     onUnsubscribed(apiClient);
                     apiClient.disconnect();
                 }
+
+                subscriptionInfoHashMap.remove(apiClient);
             }
         }));
     }
 
 
-    protected GoogleApiClient createApiClient(Subscriber<? super T> subscriber) {
+    GoogleApiClient createApiClient(Subscriber<? super T> subscriber) {
 
         ApiClientConnectionCallbacks apiClientConnectionCallbacks = new ApiClientConnectionCallbacks(subscriber);
 
@@ -173,7 +175,7 @@ public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
         @Override
         public void onConnectionFailed(ConnectionResult connectionResult) {
             if(handleResolution && connectionResult.hasResolution()) {
-                observableList.add(BaseObservable.this);
+                observableSet.add(BaseObservable.this);
 
                 if(!ResolutionActivity.isResolutionShown()) {
                     Intent intent = new Intent(ctx, ResolutionActivity.class);
@@ -192,16 +194,22 @@ public abstract class BaseObservable<T> implements Observable.OnSubscribe<T> {
     }
 
     static void onResolutionResult(int resultCode, ConnectionResult connectionResult) {
-        for(BaseObservable observable : observableList) {
-            if(!observable.subscriber.isUnsubscribed()) {
-                if (resultCode == Activity.RESULT_OK && observable.apiClient != null) {
-                    observable.apiClient.connect();
-                } else {
-                    observable.subscriber.onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient, resolution was not successful.", connectionResult));
+        for(BaseObservable observable : observableSet) {
+            for (Map.Entry<GoogleApiClient, Subscriber> entry : (Set<Map.Entry<GoogleApiClient, Subscriber>>) observable.subscriptionInfoHashMap.entrySet()) {
+                if (!entry.getValue().isUnsubscribed()) {
+                    if (resultCode == Activity.RESULT_OK) {
+                        try {
+                            entry.getKey().connect();
+                        } catch (Throwable ex) {
+                            entry.getValue().onError(ex);
+                        }
+                    } else {
+                        entry.getValue().onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient, resolution was not successful.", connectionResult));
+                    }
                 }
             }
         }
 
-        observableList.clear();
+        observableSet.clear();
     }
 }

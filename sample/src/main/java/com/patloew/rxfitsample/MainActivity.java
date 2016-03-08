@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         // switch to normal request
         subscription = RxFit.History.read(dataReadRequestServer)
                 .doOnError(throwable -> { if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) Log.e("MainActivity", "Timeout on server query request"); })
-                .onExceptionResumeNext(RxFit.History.read(dataReadRequest))
+                .compose(new RxFit.OnExceptionResumeNext<>(RxFit.History.read(dataReadRequest)))
                 .flatMap(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

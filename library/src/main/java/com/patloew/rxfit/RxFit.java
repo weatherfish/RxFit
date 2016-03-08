@@ -3,7 +3,6 @@ package com.patloew.rxfit;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 
 import com.google.android.gms.common.api.Api;
@@ -34,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Completable;
 import rx.Observable;
+import rx.exceptions.Exceptions;
+import rx.functions.Func1;
 
 /* Factory for Google Fit API observables. Make sure to include all the APIs
  * and Scopes that you need for your app. Also make sure to have the Location
@@ -106,14 +107,12 @@ public class RxFit {
         return scopes;
     }
 
-    @Nullable
-    static Long getTimeout(@Nullable Long timeout) {
-        return timeout != null ? timeout : timeoutTime;
+    static Long getDefaultTimeout() {
+        return timeoutTime;
     }
 
-    @Nullable
-    static TimeUnit getTimeoutUnit(@Nullable TimeUnit timeUnit) {
-        return timeUnit != null ? timeUnit : timeoutUnit;
+    static TimeUnit getDefaultTimeoutUnit() {
+        return timeoutUnit;
     }
 
 
@@ -444,6 +443,40 @@ public class RxFit {
         }
 
 
+    }
+
+
+    /* Transformer that behaves like onExceptionResumeNext(Observable o), but propagates
+     * a GoogleAPIConnectionException, which was caused by an unsuccessful resolution.
+     * This can be helpful if you want to resume with another RxFit Observable when
+     * an Exception occurs, but don't want to show the resolution dialog multiple times.
+     *
+     * An example use case: Fetch fitness data with server queries enabled, but provide
+     * a timeout. When an exception occurs (e.g. timeout), switch to cached fitness data.
+     * Using this Transformer prevents showing the authorization dialog twice, if the user
+     * denys access for the first read. See MainActivity in sample project.
+     */
+    public static class OnExceptionResumeNext<T, R extends T> implements Observable.Transformer<T, T> {
+
+        private final Observable<R> other;
+
+        public OnExceptionResumeNext(Observable<R> other) {
+            this.other = other;
+        }
+
+        @Override
+        public Observable<T> call(Observable<T> source) {
+            return source.onErrorResumeNext(new Func1<Throwable, Observable<R>>() {
+                @Override
+                public Observable<R> call(Throwable throwable) {
+                    if (!(throwable instanceof Exception) || (throwable instanceof GoogleAPIConnectionException && ((GoogleAPIConnectionException) throwable).wasResolutionUnsuccessful())) {
+                        Exceptions.propagate(throwable);
+                    }
+
+                    return other;
+                }
+            });
+        }
     }
 
 }

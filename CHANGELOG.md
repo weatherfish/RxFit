@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.1.1
+
+* Fix for multiple subscribers on RxFit Observables.
+* Fixed bug which did not handle Exceptions after successful resolution.
+* Added RxFit.OnExceptionResumeNext Transformer.
+
 ## Version 1.1.0
 
 * BREAKING CHANGE: Removed PermissionRequiredException in favor of SecurityException

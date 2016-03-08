@@ -1,5 +1,6 @@
 package com.patloew.rxfit;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -61,16 +62,21 @@ import org.powermock.core.classloader.annotations.SuppressStaticInitializationFo
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import rx.Completable;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.observers.TestSubscriber;
 
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -125,26 +131,58 @@ public class RxFitTest {
     //////////////////
 
     @SuppressWarnings("unchecked")
+    private static <T> Subscriber<? super T> getSubscriber(BaseObservable<T> baseObservable, GoogleApiClient apiClient) {
+        try {
+            final Field subscriberField = BaseObservable.class.getDeclaredField("subscriptionInfoHashMap");
+            subscriberField.setAccessible(true);
+            return ((HashMap<GoogleApiClient, Subscriber<? super T>>) subscriberField.get(baseObservable)).get(apiClient);
+        } catch(Exception e) {
+            return null;
+        }
+    }
+
     // Mock GoogleApiClient connection success behaviour
-    private void setupBaseObservableSuccess(final BaseObservable baseObservable) {
-        doReturn(apiClient).when(baseObservable).createApiClient(Matchers.<Subscriber>any());
+    private <T> void setupBaseObservableSuccess(final BaseObservable<T> baseObservable) {
+        setupBaseObservableSuccess(baseObservable, apiClient);
+    }
+
+    // Mock GoogleApiClient connection success behaviour
+    private <T> void setupBaseObservableSuccess(final BaseObservable<T> baseObservable, final GoogleApiClient apiClient) {
+        doReturn(apiClient).when(baseObservable).createApiClient(Matchers.<Subscriber<? super T>>any());
         doAnswer(new Answer<Object>() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                baseObservable.onGoogleApiClientReady(apiClient, baseObservable.subscriber);
+                baseObservable.onGoogleApiClientReady(apiClient, getSubscriber(baseObservable, apiClient));
                 return null;
             }
         }).when(apiClient).connect();
     }
 
-    @SuppressWarnings("unchecked")
-    // Mock GoogleApiClient connection error behaviour
-    private void setupBaseObservableError(final BaseObservable baseObservable) {
-        doReturn(apiClient).when(baseObservable).createApiClient(Matchers.<Subscriber>any());
+    // Mock GoogleApiClient resolution behaviour
+    private <T> void setupBaseObservableResolution(final BaseObservable<T> observable, GoogleApiClient apiClient) {
+        doReturn(apiClient).when(observable).createApiClient(Matchers.<Subscriber<? super T>>any());
         doAnswer(new Answer<Object>() {
+            @SuppressWarnings({"ConstantConditions", "unchecked"})
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                baseObservable.subscriber.onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient.", connectionResult));
+                try {
+                    final Field observableSetField = BaseObservable.class.getDeclaredField("observableSet");
+                    observableSetField.setAccessible(true);
+                    ((Set<BaseObservable>)observableSetField.get(observable)).add(observable);
+                } catch(Exception e) { }
+                return null;
+            }
+        }).when(apiClient).connect();
+    }
+
+    // Mock GoogleApiClient connection error behaviour
+    private <T> void setupBaseObservableError(final BaseObservable<T> baseObservable) {
+        doReturn(apiClient).when(baseObservable).createApiClient(Matchers.<Subscriber<? super T>>any());
+        doAnswer(new Answer<Object>() {
+            @SuppressWarnings("ConstantConditions")
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                getSubscriber(baseObservable, apiClient).onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient.", connectionResult));
                 return null;
             }
         }).when(apiClient).connect();
@@ -161,14 +199,14 @@ public class RxFitTest {
         }).when(pendingResult).setResultCallback(Matchers.<ResultCallback>any());
     }
 
-    private void assertError(TestSubscriber sub, Class<? extends Throwable> errorClass) {
+    private static void assertError(TestSubscriber sub, Class<? extends Throwable> errorClass) {
         sub.assertError(errorClass);
         sub.assertNoValues();
         sub.assertUnsubscribed();
     }
 
     @SuppressWarnings("unchecked")
-    private void assertSingleValue(TestSubscriber sub, Object value) {
+    private static void assertSingleValue(TestSubscriber sub, Object value) {
         sub.assertCompleted();
         sub.assertUnsubscribed();
         sub.assertValue(value);
@@ -227,6 +265,115 @@ public class RxFitTest {
         Completable.fromObservable(Observable.create(observable)).subscribe(sub);
 
         sub.assertError(GoogleAPIConnectionException.class);
+        sub.assertNoValues();
+    }
+
+
+    @Test
+    public void CheckConnectionCompletable_Resolution_Success() {
+        TestSubscriber<GoogleApiClient> sub1 = new TestSubscriber<>();
+        TestSubscriber<GoogleApiClient> sub2 = new TestSubscriber<>();
+        final GoogleApiClient apiClient2 = Mockito.mock(GoogleApiClient.class);
+        final CheckConnectionObservable observable = spy(new CheckConnectionObservable(rxFit));
+
+        Completable completable = Completable.fromObservable(Observable.create(observable));
+
+        setupBaseObservableResolution(observable, apiClient);
+        completable.subscribe(sub1);
+
+        setupBaseObservableResolution(observable, apiClient2);
+        completable.subscribe(sub2);
+
+        setupBaseObservableSuccess(observable, apiClient);
+        setupBaseObservableSuccess(observable, apiClient2);
+
+        BaseObservable.onResolutionResult(Activity.RESULT_OK, Mockito.mock(ConnectionResult.class));
+
+        sub1.assertCompleted();
+        sub1.assertNoValues();
+
+        sub2.assertCompleted();
+        sub2.assertNoValues();
+    }
+
+    @Test
+    public void CheckConnectionCompletable_Resolution_Error() {
+        TestSubscriber<GoogleApiClient> sub1 = new TestSubscriber<>();
+        TestSubscriber<GoogleApiClient> sub2 = new TestSubscriber<>();
+        final GoogleApiClient apiClient2 = Mockito.mock(GoogleApiClient.class);
+        final CheckConnectionObservable observable = spy(new CheckConnectionObservable(rxFit));
+
+        Completable completable = Completable.fromObservable(Observable.create(observable));
+
+        setupBaseObservableResolution(observable, apiClient);
+        completable.subscribe(sub1);
+
+        setupBaseObservableResolution(observable, apiClient2);
+        completable.subscribe(sub2);
+
+        setupBaseObservableSuccess(observable, apiClient);
+        setupBaseObservableSuccess(observable, apiClient2);
+
+        BaseObservable.onResolutionResult(Activity.RESULT_CANCELED, Mockito.mock(ConnectionResult.class));
+
+        sub1.assertError(GoogleAPIConnectionException.class);
+        sub1.assertNoValues();
+
+        sub2.assertError(GoogleAPIConnectionException.class);
+        sub2.assertNoValues();
+    }
+
+    @Test
+    public void CheckConnectionCompletable_Resolution_Error_ResumeNext_Resolution_Success() {
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        ConnectionResult connectionResult = Mockito.mock(ConnectionResult.class);
+        final CheckConnectionObservable observable = spy(new CheckConnectionObservable(rxFit));
+
+        setupBaseObservableResolution(observable, apiClient);
+        Completable.fromObservable(Observable.create(observable).compose(new RxFit.OnExceptionResumeNext<Void, Void>(Observable.<Void>just(null))))
+                .subscribe(sub);
+
+        setupBaseObservableSuccess(observable);
+        when(connectionResult.hasResolution()).thenReturn(true);
+        BaseObservable.onResolutionResult(Activity.RESULT_CANCELED, connectionResult);
+
+        sub.assertError(GoogleAPIConnectionException.class);
+        sub.assertNoValues();
+    }
+
+    @Test
+    public void CheckConnectionCompletable_Resolution_Error_ResumeNext_NoResolution_Success() {
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        ConnectionResult connectionResult = Mockito.mock(ConnectionResult.class);
+        final CheckConnectionObservable observable = spy(new CheckConnectionObservable(rxFit));
+
+        setupBaseObservableResolution(observable, apiClient);
+        Completable.fromObservable(Observable.create(observable).compose(new RxFit.OnExceptionResumeNext<Void, Void>(Observable.<Void>just(null))))
+                .subscribe(sub);
+
+        setupBaseObservableSuccess(observable);
+        when(connectionResult.hasResolution()).thenReturn(false);
+        BaseObservable.onResolutionResult(Activity.RESULT_CANCELED, connectionResult);
+
+        sub.assertCompleted();
+        sub.assertNoValues();
+    }
+
+    @Test
+    public void CheckConnectionCompletable_Resolution_Success_ResumeNext_Error() {
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        ConnectionResult connectionResult = Mockito.mock(ConnectionResult.class);
+        final CheckConnectionObservable observable = spy(new CheckConnectionObservable(rxFit));
+
+        setupBaseObservableResolution(observable, apiClient);
+        Completable.fromObservable(Observable.create(observable).compose(new RxFit.OnExceptionResumeNext<Void, Void>(Observable.<Void>just(null))))
+                .subscribe(sub);
+
+        setupBaseObservableSuccess(observable);
+        doThrow(new Error("Generic error")).when(observable).onGoogleApiClientReady(Matchers.any(GoogleApiClient.class), Matchers.any(Observer.class));
+        BaseObservable.onResolutionResult(Activity.RESULT_OK, connectionResult);
+
+        sub.assertError(Error.class);
         sub.assertNoValues();
     }
 
@@ -463,6 +610,7 @@ public class RxFitTest {
 
     // BleStartScanObservable
 
+    @SuppressWarnings("MissingPermission")
     @Test
     public void BleStartScanObservable_Success() {
         TestSubscriber<Status> sub = new TestSubscriber<>();
@@ -1191,8 +1339,7 @@ public class RxFitTest {
 
         setupBaseObservableSuccess(observable);
         Observable.create(observable).subscribe(sub);
-
-        observable.subscriber.onNext(dataPoint);
+        getSubscriber(observable, apiClient).onNext(dataPoint);
 
         verify(sensorsApi, never()).remove(Matchers.any(GoogleApiClient.class), Matchers.any(OnDataPointListener.class));
         sub.unsubscribe();

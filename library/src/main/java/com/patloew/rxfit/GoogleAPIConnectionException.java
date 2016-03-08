@@ -27,4 +27,12 @@ public class GoogleAPIConnectionException extends RuntimeException {
     public ConnectionResult getConnectionResult() {
         return connectionResult;
     }
+
+    public boolean wasResolutionUnsuccessful() {
+        if(connectionResult != null) {
+            return connectionResult.hasResolution();
+        } else {
+            return false;
+        }
+    }
 }
