@@ -1,8 +1,8 @@
 # Reactive Fit API Library for Android
 
-[![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=master)](https://travis-ci.org/patloew/RxFit) [ ![Download](https://api.bintray.com/packages/patloew/maven/com.patloew.rxfit/images/download.svg) ](https://bintray.com/patloew/maven/com.patloew.rxfit/_latestVersion) [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
+[![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=master)](https://travis-ci.org/patloew/RxFit) [ ![Download](https://api.bintray.com/packages/patloew/maven/RxFit/images/download.svg) ](https://bintray.com/patloew/maven/RxFit/_latestVersion) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RxFit-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3252) [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
 
-This library wraps the Fit API in [RxJava](https://github.com/ReactiveX/RxJava) Observables. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
+This library wraps the Fit API in [RxJava](https://github.com/ReactiveX/RxJava) Observables and Singles. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
 
 # Usage
 
@@ -25,15 +25,17 @@ DataReadRequest dataReadRequest = new DataReadRequest.Builder()
 	    .build();
 
 RxFit.History.read(dataReadRequest)
-        .flatMap(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
+        .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
         .subscribe(bucket -> {
         	/* do something */
         });
 ```
 
+An `OnExceptionResumeNext` Transformer is available in the lib, which resumes with another Single/Observable when an Exception is thrown, except when the exception was a GoogleAPIConnectionException which was caused by an unresolved resolution.
+
 An optional global default timeout for all Fit API requests made through the library can be set via `RxFit.setDefaultTimeout(...)`. In addition, timeouts can be set when creating a new Observable by providing timeout parameters, e.g. `RxFit.History.read(dataReadRequest, 15, TimeUnit.SECONDS)`. These parameters override the default timeout. When a timeout occurs, a StatusException is provided via `onError()`. The RxJava timeout operators can be used instead, but these do not cancel the Fit API request immediately.
 
-You can also obtain an `Observable<GoogleApiClient>`, which connects on subscribe and disconnects on unsubscribe via `GoogleAPIClientObservable.create(...)`.
+You can also obtain a `Single<GoogleApiClient>`, which connects on subscribe and disconnects on unsubscribe via `GoogleAPIClientSingle.create(...)`.
 
 The following Exceptions are thrown in the lib and provided via `onError()`:
 
@@ -51,7 +53,7 @@ A basic sample app is available in the `sample` project. You need to create an O
 The lib is available on jCenter. Add the following to your `build.gradle`:
 
 	dependencies {
-	    compile 'com.patloew.rxfit:rxfit:1.1.1'
+	    compile 'com.patloew.rxfit:rxfit:1.2.0'
 	}
 
 # Credits

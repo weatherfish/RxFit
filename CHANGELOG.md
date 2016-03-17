@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.2.0
+
+* BREAKING CHANGE: The lib now uses Singles instead of Observables if only one item is emitted.
+* BREAKING CHANGE: Observables, which previously emitted a single List, now emit the items of the list.
+* BREAKING CHANGE: `RxFit.Ble.startScan(...)` and `stopScan(...)` was removed and replaced by `RxFit.Ble.scan(...)`.
+* Added RxFit.OnExceptionResumeNext.Single Transformer.
+
 ## Version 1.1.1
 
 * Fix for multiple subscribers on RxFit Observables.

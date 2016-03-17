@@ -10,15 +10,28 @@ import com.google.android.gms.fitness.data.Subscription;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Observer;
+import rx.SingleSubscriber;
 
-public class RecordingUnsubscribeObservable extends BaseObservable<Status> {
+/* Copyright 2016 Patrick Löwenstein
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. */
+public class RecordingUnsubscribeSingle extends BaseSingle<Status> {
 
     private final DataSource dataSource;
     private final DataType dataType;
     private final Subscription subscription;
 
-    RecordingUnsubscribeObservable(RxFit rxFit, DataSource dataSource, DataType dataType, Subscription subscription, Long timeout, TimeUnit timeUnit) {
+    RecordingUnsubscribeSingle(RxFit rxFit, DataSource dataSource, DataType dataType, Subscription subscription, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
         this.dataSource = dataSource;
         this.dataType = dataType;
@@ -26,8 +39,8 @@ public class RecordingUnsubscribeObservable extends BaseObservable<Status> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Observer<? super Status> observer) {
-        ResultCallback<Status> resultCallback = new StatusResultCallBack(observer);
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
+        ResultCallback<Status> resultCallback = new StatusResultCallBack(subscriber);
 
         if(dataSource != null) {
             setupFitnessPendingResult(Fitness.RecordingApi.unsubscribe(apiClient, dataSource), resultCallback);

@@ -1,9 +1,11 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
-import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.data.DataSet;
+
+import java.util.concurrent.TimeUnit;
 
 import rx.SingleSubscriber;
 
@@ -20,20 +22,17 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class StatusResultCallBack implements ResultCallback<Status> {
+public class HistoryInsertDataSingle extends BaseSingle<Status> {
 
-    private final SingleSubscriber<? super Status> subscriber;
+    private final DataSet dataSet;
 
-    public StatusResultCallBack(@NonNull SingleSubscriber<? super Status> subscriber) {
-        this.subscriber = subscriber;
+    HistoryInsertDataSingle(RxFit rxFit, DataSet dataSet, Long timeout, TimeUnit timeUnit) {
+        super(rxFit, timeout, timeUnit);
+        this.dataSet = dataSet;
     }
 
     @Override
-    public void onResult(@NonNull Status status) {
-        if (!status.isSuccess()) {
-            subscriber.onError(new StatusException(status));
-        } else {
-            subscriber.onSuccess(status);
-        }
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
+        setupFitnessPendingResult(Fitness.HistoryApi.insertData(apiClient, dataSet), new StatusResultCallBack(subscriber));
     }
 }

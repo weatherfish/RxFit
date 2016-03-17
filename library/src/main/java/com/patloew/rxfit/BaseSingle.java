@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.Subscriber;
+import rx.Single;
+import rx.SingleSubscriber;
 import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
@@ -39,23 +39,23 @@ import rx.subscriptions.Subscriptions;
  * FILE MODIFIED by Patrick Löwenstein, 2016
  *
  */
-public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.OnSubscribe<T> {
+public abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> {
     private final boolean handleResolution;
 
-    private final HashMap<GoogleApiClient, Subscriber<? super T>> subscriptionInfoHashMap = new HashMap<>();
+    private final HashMap<GoogleApiClient, SingleSubscriber<? super T>> subscriptionInfoHashMap = new HashMap<>();
 
-    protected BaseObservable(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
+    protected BaseSingle(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
         handleResolution = true;
     }
 
-    protected BaseObservable(@NonNull Context ctx, @NonNull Api<? extends Api.ApiOptions.NotRequiredOptions>[] services, Scope[] scopes) {
+    protected BaseSingle(@NonNull Context ctx, @NonNull Api<? extends Api.ApiOptions.NotRequiredOptions>[] services, Scope[] scopes) {
         super(ctx, services, scopes);
         handleResolution = false;
     }
 
     @Override
-    public final void call(Subscriber<? super T> subscriber) {
+    public final void call(SingleSubscriber<? super T> subscriber) {
         final GoogleApiClient apiClient = createApiClient(new ApiClientConnectionCallbacks(subscriber));
         subscriptionInfoHashMap.put(apiClient, subscriber);
 
@@ -78,10 +78,10 @@ public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.
         }));
     }
 
-    protected abstract void onGoogleApiClientReady(GoogleApiClient apiClient, Subscriber<? super T> subscriber);
+    protected abstract void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super T> subscriber);
 
     protected final void handleResolutionResult(int resultCode, ConnectionResult connectionResult) {
-        for (Map.Entry<GoogleApiClient, Subscriber<? super T>> entry : subscriptionInfoHashMap.entrySet()) {
+        for (Map.Entry<GoogleApiClient, SingleSubscriber<? super T>> entry : subscriptionInfoHashMap.entrySet()) {
             if (!entry.getValue().isUnsubscribed()) {
                 if (resultCode == Activity.RESULT_OK) {
                     try {
@@ -98,11 +98,11 @@ public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.
 
     protected class ApiClientConnectionCallbacks extends BaseRx.ApiClientConnectionCallbacks {
 
-        final protected Subscriber<? super T> subscriber;
+        final protected SingleSubscriber<? super T> subscriber;
 
         private GoogleApiClient apiClient;
 
-        private ApiClientConnectionCallbacks(Subscriber<? super T> subscriber) {
+        private ApiClientConnectionCallbacks(SingleSubscriber<? super T> subscriber) {
             this.subscriber = subscriber;
         }
 
@@ -123,7 +123,7 @@ public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.
         @Override
         public void onConnectionFailed(ConnectionResult connectionResult) {
             if(handleResolution && connectionResult.hasResolution()) {
-                observableSet.add(BaseObservable.this);
+                observableSet.add(BaseSingle.this);
 
                 if(!ResolutionActivity.isResolutionShown()) {
                     Intent intent = new Intent(ctx, ResolutionActivity.class);
