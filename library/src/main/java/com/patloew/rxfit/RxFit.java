@@ -665,43 +665,44 @@ public class RxFit {
      * Using this Transformer prevents showing the authorization dialog twice, if the user
      * denys access for the first read. See MainActivity in sample project.
      */
-    public static class OnExceptionResumeNext<T, R extends T> implements Observable.Transformer<T, T> {
+    public static class OnExceptionResumeNext {
 
-        private final Observable<R> other;
+        private OnExceptionResumeNext() { }
 
-        public OnExceptionResumeNext(Observable<R> other) {
-            this.other = other;
-        }
-
-        @Override
-        public Observable<T> call(Observable<T> source) {
-            return source.onErrorResumeNext(new Func1<Throwable, Observable<R>>() {
+        public static <T, R extends T> Observable.Transformer<T, T> with(final Observable<R> other) {
+            return new Observable.Transformer<T, T>() {
                 @Override
-                public Observable<R> call(Throwable throwable) {
-                    if (!(throwable instanceof Exception) || (throwable instanceof GoogleAPIConnectionException && ((GoogleAPIConnectionException) throwable).wasResolutionUnsuccessful())) {
-                        Exceptions.propagate(throwable);
-                    }
+                public Observable<T> call(Observable<T> source) {
+                    return source.onErrorResumeNext(new Func1<Throwable, Observable<R>>() {
+                        @Override
+                        public Observable<R> call(Throwable throwable) {
+                            if (!(throwable instanceof Exception) || (throwable instanceof GoogleAPIConnectionException && ((GoogleAPIConnectionException) throwable).wasResolutionUnsuccessful())) {
+                                throw Exceptions.propagate(throwable);
+                            }
 
-                    return other;
+                            return other;
+                        }
+                    });
                 }
-            });
+            };
         }
 
-        public static class Single<T, R extends T> implements rx.Single.Transformer<T, T> {
+        public static <T, R extends T> Single.Transformer<T, T> with(final Single<R> other) {
+            return new Single.Transformer<T, T>() {
+                @Override
+                public Single<T> call(Single<T> source) {
+                    return source.onErrorResumeNext(new Func1<Throwable, Single<R>>() {
+                        @Override
+                        public Single<R> call(Throwable throwable) {
+                            if (!(throwable instanceof Exception) || (throwable instanceof GoogleAPIConnectionException && ((GoogleAPIConnectionException) throwable).wasResolutionUnsuccessful())) {
+                                throw Exceptions.propagate(throwable);
+                            }
 
-            private final rx.Single<R> other;
-
-            public Single(rx.Single<R> other) {
-                this.other = other;
-            }
-
-            @Override
-            public rx.Single<T> call(rx.Single<T> source) {
-                // TODO: Use Single onErrorResumeNext() which returns another Single when available
-                return source.toObservable()
-                        .compose(new OnExceptionResumeNext<T, R>(other.toObservable()))
-                        .toSingle();
-            }
+                            return other;
+                        }
+                    });
+                }
+            };
         }
     }
 

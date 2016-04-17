@@ -404,7 +404,7 @@ public class RxFitTest {
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(new RxFit.OnExceptionResumeNext<Void, Void>(Observable.<Void>just(null))))
+        Completable.fromObservable(Observable.create(observable).compose(RxFit.OnExceptionResumeNext.with(Observable.<Void>just(null))))
                 .subscribe(sub);
 
         when(connectionResult.hasResolution()).thenReturn(true);
@@ -421,7 +421,7 @@ public class RxFitTest {
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(new RxFit.OnExceptionResumeNext<Void, Void>(Observable.<Void>just(null))))
+        Completable.fromObservable(Observable.create(observable).compose(RxFit.OnExceptionResumeNext.with(Observable.<Void>just(null))))
                 .subscribe(sub);
 
         when(connectionResult.hasResolution()).thenReturn(false);
@@ -438,7 +438,7 @@ public class RxFitTest {
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(new RxFit.OnExceptionResumeNext<Void, Void>(Observable.<Void>just(null))))
+        Completable.fromObservable(Observable.create(observable).compose(RxFit.OnExceptionResumeNext.with(Observable.<Void>just(null))))
                 .subscribe(sub);
 
         doAnswer(new Answer<Object>() {

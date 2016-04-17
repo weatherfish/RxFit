@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.2.1
+
+* BREAKING CHANGE: RxFit.OnExceptionResumeNext now exposes a static `.with()` method, which returns a Single or Observable Transformer.
+* Updated dependencies.
+
 ## Version 1.2.0
 
 * BREAKING CHANGE: The lib now uses Singles instead of Observables if only one item is emitted.
