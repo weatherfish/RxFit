@@ -11,8 +11,8 @@ import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -42,7 +42,7 @@ import rx.subscriptions.Subscriptions;
 public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.OnSubscribe<T> {
     private final boolean handleResolution;
 
-    private final HashMap<GoogleApiClient, Subscriber<? super T>> subscriptionInfoHashMap = new HashMap<>();
+    private final Map<GoogleApiClient, Subscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();
 
     protected BaseObservable(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -57,7 +57,7 @@ public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.
     @Override
     public final void call(Subscriber<? super T> subscriber) {
         final GoogleApiClient apiClient = createApiClient(new ApiClientConnectionCallbacks(subscriber));
-        subscriptionInfoHashMap.put(apiClient, subscriber);
+        subscriptionInfoMap.put(apiClient, subscriber);
 
         try {
             apiClient.connect();
@@ -73,7 +73,7 @@ public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.
                     apiClient.disconnect();
                 }
 
-                subscriptionInfoHashMap.remove(apiClient);
+                subscriptionInfoMap.remove(apiClient);
             }
         }));
     }
@@ -81,7 +81,7 @@ public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.
     protected abstract void onGoogleApiClientReady(GoogleApiClient apiClient, Subscriber<? super T> subscriber);
 
     protected final void handleResolutionResult(int resultCode, ConnectionResult connectionResult) {
-        for (Map.Entry<GoogleApiClient, Subscriber<? super T>> entry : subscriptionInfoHashMap.entrySet()) {
+        for (Map.Entry<GoogleApiClient, Subscriber<? super T>> entry : subscriptionInfoMap.entrySet()) {
             if (!entry.getValue().isUnsubscribed()) {
                 if (resultCode == Activity.RESULT_OK) {
                     try {

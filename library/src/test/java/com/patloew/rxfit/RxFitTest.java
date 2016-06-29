@@ -32,6 +32,7 @@ import com.google.android.gms.fitness.request.DataDeleteRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.DataTypeCreateRequest;
+import com.google.android.gms.fitness.request.DataUpdateListenerRegistrationRequest;
 import com.google.android.gms.fitness.request.DataUpdateRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
@@ -66,6 +67,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import rx.Completable;
@@ -92,6 +94,7 @@ public class RxFitTest {
     @Mock Status status;
     @Mock ConnectionResult connectionResult;
     @Mock PendingResult pendingResult;
+    @Mock PendingIntent pendingIntent;
 
     @Mock DataType dataType;
     @Mock DataSource dataSource;
@@ -132,9 +135,9 @@ public class RxFitTest {
     @SuppressWarnings("unchecked")
     private static <T> Subscriber<? super T> getSubscriber(BaseObservable<T> baseObservable, GoogleApiClient apiClient) {
         try {
-            final Field subscriberField = BaseObservable.class.getDeclaredField("subscriptionInfoHashMap");
+            final Field subscriberField = BaseObservable.class.getDeclaredField("subscriptionInfoMap");
             subscriberField.setAccessible(true);
-            return ((HashMap<GoogleApiClient, Subscriber<? super T>>) subscriberField.get(baseObservable)).get(apiClient);
+            return ((Map<GoogleApiClient, Subscriber<? super T>>) subscriberField.get(baseObservable)).get(apiClient);
         } catch(Exception e) {
             return null;
         }
@@ -1033,6 +1036,130 @@ public class RxFitTest {
         setPendingResultValue(status);
         when(status.isSuccess()).thenReturn(false);
         when(historyApi.updateData(apiClient, dataUpdateRequest)).thenReturn(pendingResult);
+
+        setupBaseSingleSuccess(single);
+        Single.create(single).subscribe(sub);
+
+        assertError(sub, StatusException.class);
+    }
+
+    // HistoryRegisterDataUpdateListenerSingle
+
+    @Test
+    public void HistoryRegisterDataUpdateListenerSingle_DataSource_Success() {
+        TestSubscriber<Status> sub = new TestSubscriber<>();
+        HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, dataSource, null, null, null));
+
+        setPendingResultValue(status);
+        when(status.isSuccess()).thenReturn(true);
+        when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
+
+        setupBaseSingleSuccess(single);
+        Single.create(single).subscribe(sub);
+
+        assertSingleValue(sub, status);
+    }
+
+    @Test
+    public void HistoryRegisterDataUpdateListenerSingle_DataSource_StatusException() {
+        TestSubscriber<Status> sub = new TestSubscriber<>();
+        HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, dataSource, null, null, null));
+
+        setPendingResultValue(status);
+        when(status.isSuccess()).thenReturn(false);
+        when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
+
+        setupBaseSingleSuccess(single);
+        Single.create(single).subscribe(sub);
+
+        assertError(sub, StatusException.class);
+    }
+
+    @Test
+    public void HistoryRegisterDataUpdateListenerSingle_DataType_Success() {
+        TestSubscriber<Status> sub = new TestSubscriber<>();
+        HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, null, dataType, null, null));
+
+        setPendingResultValue(status);
+        when(status.isSuccess()).thenReturn(true);
+        when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
+
+        setupBaseSingleSuccess(single);
+        Single.create(single).subscribe(sub);
+
+        assertSingleValue(sub, status);
+    }
+
+    @Test
+    public void HistoryRegisterDataUpdateListenerSingle_DataType_StatusException() {
+        TestSubscriber<Status> sub = new TestSubscriber<>();
+        HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, null, dataType, null, null));
+
+        setPendingResultValue(status);
+        when(status.isSuccess()).thenReturn(false);
+        when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
+
+        setupBaseSingleSuccess(single);
+        Single.create(single).subscribe(sub);
+
+        assertError(sub, StatusException.class);
+    }
+
+    @Test
+    public void HistoryRegisterDataUpdateListenerSingle_DataType_DataSource_Success() {
+        TestSubscriber<Status> sub = new TestSubscriber<>();
+        HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, dataSource, dataType, null, null));
+
+        setPendingResultValue(status);
+        when(status.isSuccess()).thenReturn(true);
+        when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
+
+        setupBaseSingleSuccess(single);
+        Single.create(single).subscribe(sub);
+
+        assertSingleValue(sub, status);
+    }
+
+    @Test
+    public void HistoryRegisterDataUpdateListenerSingle_DataType_DataSource_StatusException() {
+        TestSubscriber<Status> sub = new TestSubscriber<>();
+        HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, dataSource, dataType, null, null));
+
+        setPendingResultValue(status);
+        when(status.isSuccess()).thenReturn(false);
+        when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
+
+        setupBaseSingleSuccess(single);
+        Single.create(single).subscribe(sub);
+
+        assertError(sub, StatusException.class);
+    }
+
+    // HistoryUnregisterDataUpdateListenerSingle
+
+    @Test
+    public void HistoryUnregisterDataUpdateListenerSingle_Success() {
+        TestSubscriber<Status> sub = new TestSubscriber<>();
+        HistoryUnregisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryUnregisterDataUpdateListenerSingle(rxFit, pendingIntent, null, null));
+
+        setPendingResultValue(status);
+        when(status.isSuccess()).thenReturn(true);
+        when(historyApi.unregisterDataUpdateListener(apiClient, pendingIntent)).thenReturn(pendingResult);
+
+        setupBaseSingleSuccess(single);
+        Single.create(single).subscribe(sub);
+
+        assertSingleValue(sub, status);
+    }
+
+    @Test
+    public void HistoryUnregisterDataUpdateListenerSingle_StatusException() {
+        TestSubscriber<Status> sub = new TestSubscriber<>();
+        HistoryUnregisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryUnregisterDataUpdateListenerSingle(rxFit, pendingIntent, null, null));
+
+        setPendingResultValue(status);
+        when(status.isSuccess()).thenReturn(false);
+        when(historyApi.unregisterDataUpdateListener(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
         Single.create(single).subscribe(sub);

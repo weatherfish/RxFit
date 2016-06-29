@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.3.0
+
+* Updated to Play Services 9.2.0.
+* Updated RxJava.
+* Added support for History API `un/registerDataUpdateListener()`.
+
 ## Version 1.2.1
 
 * BREAKING CHANGE: RxFit.OnExceptionResumeNext now exposes a static `.with()` method, which returns a Single or Observable Transformer.

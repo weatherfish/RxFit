@@ -19,6 +19,7 @@ import com.google.android.gms.fitness.request.DataDeleteRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.DataTypeCreateRequest;
+import com.google.android.gms.fitness.request.DataUpdateListenerRegistrationRequest;
 import com.google.android.gms.fitness.request.DataUpdateRequest;
 import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.request.SessionInsertRequest;
@@ -391,6 +392,50 @@ public class RxFit {
 
        private static Single<Status> updateInternal(DataUpdateRequest dataUpdateRequest, Long timeout, TimeUnit timeUnit) {
            return Single.create(new HistoryUpdateDataSingle(RxFit.get(), dataUpdateRequest, timeout, timeUnit));
+       }
+
+       // register data update listener
+
+       public static Single<Status> registerDataUpdateListener(@NonNull PendingIntent pendingIntent, @NonNull DataSource dataSource) {
+           return registerDataUpdateListenerInternal(pendingIntent, dataSource, null, null, null);
+       }
+
+       public static Single<Status> registerDataUpdateListener(@NonNull PendingIntent pendingIntent, @NonNull DataSource dataSource, long timeout, @NonNull TimeUnit timeUnit) {
+           return registerDataUpdateListenerInternal(pendingIntent, dataSource, null, timeout, timeUnit);
+       }
+
+       public static Single<Status> registerDataUpdateListener(@NonNull PendingIntent pendingIntent, @NonNull DataType dataType) {
+           return registerDataUpdateListenerInternal(pendingIntent, null, dataType, null, null);
+       }
+
+       public static Single<Status> registerDataUpdateListener(@NonNull PendingIntent pendingIntent, @NonNull DataType dataType, long timeout, @NonNull TimeUnit timeUnit) {
+           return registerDataUpdateListenerInternal(pendingIntent, null, dataType, timeout, timeUnit);
+       }
+
+       public static Single<Status> registerDataUpdateListener(@NonNull PendingIntent pendingIntent, @NonNull DataSource dataSource, @NonNull DataType dataType) {
+           return registerDataUpdateListenerInternal(pendingIntent, dataSource, dataType, null, null);
+       }
+
+       public static Single<Status> registerDataUpdateListener(@NonNull PendingIntent pendingIntent, @NonNull DataSource dataSource, @NonNull DataType dataType, long timeout, @NonNull TimeUnit timeUnit) {
+           return registerDataUpdateListenerInternal(pendingIntent, dataSource, dataType, timeout, timeUnit);
+       }
+
+       private static Single<Status> registerDataUpdateListenerInternal(PendingIntent pendingIntent, DataSource dataSource, DataType dataType, Long timeout, TimeUnit timeUnit) {
+           return Single.create(new HistoryRegisterDataUpdateListenerSingle(RxFit.get(), pendingIntent, dataSource, dataType, timeout, timeUnit));
+       }
+
+       // unregister data update listener
+
+       public static Single<Status> unregisterDataUpdateListener(@NonNull PendingIntent pendingIntent) {
+           return unregisterDataUpdateListenerInternal(pendingIntent, null, null);
+       }
+
+       public static Single<Status> unregisterDataUpdateListener(@NonNull PendingIntent pendingIntent, long timeout, @NonNull TimeUnit timeUnit) {
+           return unregisterDataUpdateListenerInternal(pendingIntent, timeout, timeUnit);
+       }
+
+       private static Single<Status> unregisterDataUpdateListenerInternal(PendingIntent pendingIntent, Long timeout, TimeUnit timeUnit) {
+           return Single.create(new HistoryUnregisterDataUpdateListenerSingle(RxFit.get(), pendingIntent, timeout, timeUnit));
        }
 
    }
