@@ -31,6 +31,11 @@ public class RxSchedulersOverrideRule implements TestRule {
         }
 
         @Override
+        public Scheduler getComputationScheduler() {
+            return Schedulers.immediate();
+        }
+
+        @Override
         public Scheduler getNewThreadScheduler() {
             return Schedulers.immediate();
         }

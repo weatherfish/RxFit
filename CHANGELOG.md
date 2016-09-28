@@ -3,7 +3,7 @@
 ## Version 1.4.0
 
 * Updated Play Services (9.6.1) and RxJava (1.2.0).
-* RxFit no longer provides static methods. Create an instance once and share it, e.g. via dependency injection or by providing the instance via your Application class.
+* BREAKING CHANGE: RxFit no longer provides static methods. Create an instance once and share it, e.g. via dependency injection or by providing the instance via your Application class.
 
 ## Version 1.3.0
 
