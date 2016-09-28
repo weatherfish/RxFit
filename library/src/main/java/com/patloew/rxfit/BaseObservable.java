@@ -39,7 +39,7 @@ import rx.subscriptions.Subscriptions;
  * FILE MODIFIED by Patrick Löwenstein, 2016
  *
  */
-public abstract class BaseObservable<T> extends BaseRx<T> implements Observable.OnSubscribe<T> {
+abstract class BaseObservable<T> extends BaseRx<T> implements Observable.OnSubscribe<T> {
     private final boolean handleResolution;
 
     private final Map<GoogleApiClient, Subscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();

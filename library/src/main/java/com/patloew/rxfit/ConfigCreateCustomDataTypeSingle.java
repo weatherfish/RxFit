@@ -26,7 +26,7 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class ConfigCreateCustomDataTypeSingle extends BaseSingle<DataType> {
+class ConfigCreateCustomDataTypeSingle extends BaseSingle<DataType> {
 
     private final DataTypeCreateRequest dataTypeCreateRequest;
 

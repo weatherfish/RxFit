@@ -24,7 +24,7 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class SensorsAddDataPointIntentSingle extends BaseSingle<Status> {
+class SensorsAddDataPointIntentSingle extends BaseSingle<Status> {
 
     private final SensorRequest sensorRequest;
     private final PendingIntent pendingIntent;

@@ -39,7 +39,7 @@ import rx.subscriptions.Subscriptions;
  * FILE MODIFIED by Patrick Löwenstein, 2016
  *
  */
-public abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> {
+abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> {
     private final boolean handleResolution;
 
     private final Map<GoogleApiClient, SingleSubscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();

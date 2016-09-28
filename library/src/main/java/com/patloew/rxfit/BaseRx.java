@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * FILE MODIFIED by Patrick Löwenstein, 2016
  *
  */
-public abstract class BaseRx<T> {
+abstract class BaseRx<T> {
     protected static final Set<BaseRx> observableSet = new HashSet<>();
 
     protected final Context ctx;
@@ -44,16 +44,16 @@ public abstract class BaseRx<T> {
     private final TimeUnit timeoutUnit;
 
     protected BaseRx(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
-        this.ctx = rxFit.getContext();
-        this.services = rxFit.getApis();
-        this.scopes = rxFit.getScopes();
+        this.ctx = rxFit.ctx;
+        this.services = rxFit.apis;
+        this.scopes = rxFit.scopes;
 
         if(timeout != null && timeUnit != null) {
             this.timeoutTime = timeout;
             this.timeoutUnit = timeUnit;
         } else {
-            this.timeoutTime = RxFit.getDefaultTimeout();
-            this.timeoutUnit = RxFit.getDefaultTimeoutUnit();
+            this.timeoutTime = rxFit.timeoutTime;
+            this.timeoutUnit = rxFit.timeoutUnit;
         }
     }
 

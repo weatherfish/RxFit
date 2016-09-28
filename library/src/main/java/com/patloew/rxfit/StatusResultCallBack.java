@@ -20,7 +20,7 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class StatusResultCallBack implements ResultCallback<Status> {
+class StatusResultCallBack implements ResultCallback<Status> {
 
     private final SingleSubscriber<? super Status> subscriber;
 

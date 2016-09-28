@@ -22,7 +22,7 @@ import com.google.android.gms.common.ConnectionResult;
  * limitations under the License. */
 public class ResolutionActivity extends Activity {
 
-    protected static final String ARG_CONNECTION_RESULT = "connectionResult";
+    static final String ARG_CONNECTION_RESULT = "connectionResult";
 
     private static final int REQUEST_CODE_RESOLUTION = 123;
 

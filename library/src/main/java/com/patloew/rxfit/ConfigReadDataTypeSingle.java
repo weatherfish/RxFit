@@ -25,7 +25,7 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class ConfigReadDataTypeSingle extends BaseSingle<DataType> {
+class ConfigReadDataTypeSingle extends BaseSingle<DataType> {
 
     private final String dataTypeName;
 

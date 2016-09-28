@@ -1,8 +1,6 @@
-package com.patloew.rxfit;
+package com.patloew.rxfitsample;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-
-import rx.Subscriber;
+import java.util.Date;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -17,14 +15,12 @@ import rx.Subscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-class CheckConnectionObservable extends BaseObservable<Void> {
-
-    CheckConnectionObservable(RxFit rxFit) {
-        super(rxFit, null, null);
-    }
-
-    @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, Subscriber<? super Void> subscriber) {
-        subscriber.onCompleted();
-    }
+public class FitnessSessionData {
+    public Date start;
+    public Date end;
+    public String name;
+    public String appName;
+    public String activity;
+    public int steps;
+    public int calories;
 }

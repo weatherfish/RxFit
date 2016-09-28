@@ -27,7 +27,7 @@ import rx.Subscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class SensorsDataPointObservable extends BaseObservable<DataPoint> {
+class SensorsDataPointObservable extends BaseObservable<DataPoint> {
 
     private final SensorRequest sensorRequest;
     private OnDataPointListener dataPointListener = null;

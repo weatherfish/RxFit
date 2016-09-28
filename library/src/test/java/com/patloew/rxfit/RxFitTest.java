@@ -65,7 +65,6 @@ import org.powermock.reflect.Whitebox;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -407,7 +406,7 @@ public class RxFitTest {
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(RxFit.OnExceptionResumeNext.with(Observable.<Void>just(null))))
+        Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.<Void>just(null))))
                 .subscribe(sub);
 
         when(connectionResult.hasResolution()).thenReturn(true);
@@ -424,7 +423,7 @@ public class RxFitTest {
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(RxFit.OnExceptionResumeNext.with(Observable.<Void>just(null))))
+        Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.<Void>just(null))))
                 .subscribe(sub);
 
         when(connectionResult.hasResolution()).thenReturn(false);
@@ -441,7 +440,7 @@ public class RxFitTest {
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(RxFit.OnExceptionResumeNext.with(Observable.<Void>just(null))))
+        Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.<Void>just(null))))
                 .subscribe(sub);
 
         doAnswer(new Answer<Object>() {
