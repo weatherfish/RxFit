@@ -40,8 +40,8 @@ abstract class BaseRx<T> {
     protected final Context ctx;
     private final Api<? extends Api.ApiOptions.NotRequiredOptions>[] services;
     private final Scope[] scopes;
-    private final Long timeoutTime;
-    private final TimeUnit timeoutUnit;
+    final Long timeoutTime;
+    final TimeUnit timeoutUnit;
 
     protected BaseRx(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         this.ctx = rxFit.ctx;

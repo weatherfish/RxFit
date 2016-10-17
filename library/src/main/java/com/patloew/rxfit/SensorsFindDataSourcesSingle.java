@@ -30,8 +30,8 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class SensorsFindDataSourcesSingle extends BaseSingle<List<DataSource>> {
 
-    private final DataSourcesRequest dataSourcesRequest;
-    private final DataType dataType;
+    final DataSourcesRequest dataSourcesRequest;
+    final DataType dataType;
 
     SensorsFindDataSourcesSingle(RxFit rxFit, DataSourcesRequest dataSourcesRequest, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

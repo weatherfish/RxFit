@@ -28,7 +28,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class SessionStopSingle extends BaseSingle<List<Session>> {
 
-    private final String identifier;
+    final String identifier;
 
     SessionStopSingle(RxFit rxFit, String identifier, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

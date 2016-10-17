@@ -27,7 +27,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class ConfigReadDataTypeSingle extends BaseSingle<DataType> {
 
-    private final String dataTypeName;
+    final String dataTypeName;
 
     ConfigReadDataTypeSingle(RxFit rxFit, String dataTypeName, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

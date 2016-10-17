@@ -31,8 +31,8 @@ import rx.Subscriber;
  * limitations under the License. */
 class BleScanObservable extends BaseObservable<BleDevice> {
 
-    private final DataType[] dataTypes;
-    private final Integer stopTimeSecs;
+    final DataType[] dataTypes;
+    final Integer stopTimeSecs;
 
     private BleScanCallback bleScanCallback;
 

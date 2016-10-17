@@ -28,7 +28,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class ConfigCreateCustomDataTypeSingle extends BaseSingle<DataType> {
 
-    private final DataTypeCreateRequest dataTypeCreateRequest;
+    final DataTypeCreateRequest dataTypeCreateRequest;
 
     ConfigCreateCustomDataTypeSingle(RxFit rxFit, DataTypeCreateRequest dataTypeCreateRequest, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

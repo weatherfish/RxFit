@@ -29,7 +29,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class BleListClaimedDevicesSingle extends BaseSingle<List<BleDevice>> {
 
-    private final DataType dataType;
+    final DataType dataType;
 
     BleListClaimedDevicesSingle(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

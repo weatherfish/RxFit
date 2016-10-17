@@ -29,7 +29,7 @@ import rx.Subscriber;
  * limitations under the License. */
 class SensorsDataPointObservable extends BaseObservable<DataPoint> {
 
-    private final SensorRequest sensorRequest;
+    final SensorRequest sensorRequest;
     private OnDataPointListener dataPointListener = null;
 
     SensorsDataPointObservable(RxFit rxFit, SensorRequest sensorRequest, Long timeout, TimeUnit timeUnit) {

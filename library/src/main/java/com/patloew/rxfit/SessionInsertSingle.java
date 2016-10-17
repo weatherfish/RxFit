@@ -24,7 +24,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class SessionInsertSingle extends BaseSingle<Status> {
 
-    private final SessionInsertRequest sessionInsertRequest;
+    final SessionInsertRequest sessionInsertRequest;
 
     SessionInsertSingle(RxFit rxFit, SessionInsertRequest sessionInsertRequest, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

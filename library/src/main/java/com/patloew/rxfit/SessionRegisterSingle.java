@@ -25,7 +25,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class SessionRegisterSingle extends BaseSingle<Status> {
 
-    private final PendingIntent pendingIntent;
+    final PendingIntent pendingIntent;
 
     SessionRegisterSingle(RxFit rxFit, PendingIntent pendingIntent, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

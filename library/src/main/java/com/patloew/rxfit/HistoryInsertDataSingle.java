@@ -24,7 +24,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class HistoryInsertDataSingle extends BaseSingle<Status> {
 
-    private final DataSet dataSet;
+    final DataSet dataSet;
 
     HistoryInsertDataSingle(RxFit rxFit, DataSet dataSet, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

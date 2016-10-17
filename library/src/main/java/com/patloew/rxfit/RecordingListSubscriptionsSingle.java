@@ -29,7 +29,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class RecordingListSubscriptionsSingle extends BaseSingle<List<Subscription>> {
 
-    private final DataType dataType;
+    final DataType dataType;
 
     RecordingListSubscriptionsSingle(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

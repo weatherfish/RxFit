@@ -29,7 +29,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class HistoryRegisterDataUpdateListenerSingle extends BaseSingle<Status> {
 
-    private final DataUpdateListenerRegistrationRequest request;
+    final DataUpdateListenerRegistrationRequest request;
 
     HistoryRegisterDataUpdateListenerSingle(RxFit rxFit, PendingIntent pendingIntent, DataSource dataSource, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

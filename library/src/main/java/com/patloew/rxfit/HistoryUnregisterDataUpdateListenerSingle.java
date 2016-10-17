@@ -26,7 +26,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class HistoryUnregisterDataUpdateListenerSingle extends BaseSingle<Status> {
 
-    private final PendingIntent pendingIntent;
+    final PendingIntent pendingIntent;
 
     HistoryUnregisterDataUpdateListenerSingle(RxFit rxFit, PendingIntent pendingIntent, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

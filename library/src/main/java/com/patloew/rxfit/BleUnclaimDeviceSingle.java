@@ -25,8 +25,8 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class BleUnclaimDeviceSingle extends BaseSingle<Status> {
 
-    private final BleDevice bleDevice;
-    private final String deviceAddress;
+    final BleDevice bleDevice;
+    final String deviceAddress;
 
     BleUnclaimDeviceSingle(RxFit rxFit, BleDevice bleDevice, String deviceAddress, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

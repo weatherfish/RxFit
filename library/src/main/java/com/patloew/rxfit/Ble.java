@@ -71,7 +71,7 @@ public class Ble {
         return getClaimedDeviceListInternal(dataType, null, null);
     }
 
-    private Observable<BleDevice> getClaimedDevicesInternal(DataType dataType, long timeout, @NonNull TimeUnit timeUnit) {
+    public Observable<BleDevice> getClaimedDevices(DataType dataType, long timeout, @NonNull TimeUnit timeUnit) {
         return getClaimedDeviceListInternal(dataType, timeout, timeUnit);
     }
 

@@ -27,9 +27,9 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class RecordingUnsubscribeSingle extends BaseSingle<Status> {
 
-    private final DataSource dataSource;
-    private final DataType dataType;
-    private final Subscription subscription;
+    final DataSource dataSource;
+    final DataType dataType;
+    final Subscription subscription;
 
     RecordingUnsubscribeSingle(RxFit rxFit, DataSource dataSource, DataType dataType, Subscription subscription, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

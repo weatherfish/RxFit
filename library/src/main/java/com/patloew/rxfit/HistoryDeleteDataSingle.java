@@ -24,7 +24,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class HistoryDeleteDataSingle extends BaseSingle<Status> {
 
-    private final DataDeleteRequest dataDeleteRequest;
+    final DataDeleteRequest dataDeleteRequest;
 
     HistoryDeleteDataSingle(RxFit rxFit, DataDeleteRequest dataDeleteRequest, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

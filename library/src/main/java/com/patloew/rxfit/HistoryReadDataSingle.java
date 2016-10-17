@@ -27,7 +27,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class HistoryReadDataSingle extends BaseSingle<DataReadResult> {
 
-    private final DataReadRequest dataReadRequest;
+    final DataReadRequest dataReadRequest;
 
     HistoryReadDataSingle(RxFit rxFit, DataReadRequest dataReadRequest, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

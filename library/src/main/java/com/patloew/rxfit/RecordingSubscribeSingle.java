@@ -26,8 +26,8 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class RecordingSubscribeSingle extends BaseSingle<Status> {
 
-    private final DataSource dataSource;
-    private final DataType dataType;
+    final DataSource dataSource;
+    final DataType dataType;
 
     RecordingSubscribeSingle(RxFit rxFit, DataSource dataSource, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

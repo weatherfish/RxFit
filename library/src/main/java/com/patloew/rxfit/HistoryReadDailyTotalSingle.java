@@ -28,7 +28,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class HistoryReadDailyTotalSingle extends BaseSingle<DataSet> {
 
-    private final DataType dataType;
+    final DataType dataType;
 
     HistoryReadDailyTotalSingle(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

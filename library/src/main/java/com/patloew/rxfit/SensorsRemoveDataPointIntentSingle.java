@@ -25,7 +25,7 @@ import rx.SingleSubscriber;
  * limitations under the License. */
 class SensorsRemoveDataPointIntentSingle extends BaseSingle<Status> {
 
-    private final PendingIntent pendingIntent;
+    final PendingIntent pendingIntent;
 
     SensorsRemoveDataPointIntentSingle(RxFit rxFit, PendingIntent pendingIntent, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
