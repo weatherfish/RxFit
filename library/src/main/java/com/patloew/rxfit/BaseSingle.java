@@ -42,7 +42,7 @@ import rx.subscriptions.Subscriptions;
 abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> {
     private final boolean handleResolution;
 
-    private final Map<GoogleApiClient, SingleSubscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();
+    final Map<GoogleApiClient, SingleSubscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();
 
     protected BaseSingle(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);

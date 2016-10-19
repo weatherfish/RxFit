@@ -73,9 +73,13 @@ abstract class BaseRx<T> {
         }
     }
 
-    protected final GoogleApiClient createApiClient(ApiClientConnectionCallbacks apiClientConnectionCallbacks) {
+    protected GoogleApiClient.Builder getApiClientBuilder() {
+        return new GoogleApiClient.Builder(ctx);
+    }
 
-        GoogleApiClient.Builder apiClientBuilder = new GoogleApiClient.Builder(ctx);
+    protected GoogleApiClient createApiClient(ApiClientConnectionCallbacks apiClientConnectionCallbacks) {
+
+        GoogleApiClient.Builder apiClientBuilder = getApiClientBuilder();
 
 
         for (Api<? extends Api.ApiOptions.NotRequiredOptions> service : services) {

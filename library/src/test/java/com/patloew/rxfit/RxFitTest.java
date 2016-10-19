@@ -13,6 +13,7 @@ import com.google.android.gms.fitness.Fitness;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -29,12 +30,16 @@ import rx.Single;
 import rx.Subscriber;
 import rx.observers.TestSubscriber;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareOnlyThisForTest({ ContextCompat.class, Fitness.class, Status.class, ConnectionResult.class, BaseRx.class })
+@PrepareOnlyThisForTest({ Observable.class, ContextCompat.class, Fitness.class, Status.class, ConnectionResult.class, BaseRx.class })
 @SuppressStaticInitializationFor("com.google.android.gms.fitness.Fitness")
 public class RxFitTest extends BaseOnSubscribeTest {
 
@@ -42,6 +47,54 @@ public class RxFitTest extends BaseOnSubscribeTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         super.setup();
+    }
+
+    // RxFit
+
+    @Test
+    public void setTimeout() {
+        rxFit.setDefaultTimeout(TIMEOUT_TIME, TIMEOUT_TIMEUNIT);
+        assertEquals(TIMEOUT_TIME, (long) rxFit.timeoutTime);
+        assertEquals(TIMEOUT_TIMEUNIT, rxFit.timeoutUnit);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setTimeout_TimeUnitMissing() {
+        rxFit.setDefaultTimeout(TIMEOUT_TIME, null);
+        assertNull(rxFit.timeoutTime);
+        assertNull(rxFit.timeoutUnit);
+    }
+
+    @Test
+    public void resetDefaultTimeout() {
+        rxFit.setDefaultTimeout(TIMEOUT_TIME, TIMEOUT_TIMEUNIT);
+        rxFit.resetDefaultTimeout();
+        assertNull(rxFit.timeoutTime);
+        assertNull(rxFit.timeoutUnit);
+    }
+
+
+    // Check Connection
+
+    @Test
+    public void checkConnection() {
+        final Observable<Void> observable = Observable.just(null);
+        PowerMockito.mockStatic(Observable.class, new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                return observable;
+            }
+        });
+
+        ArgumentCaptor<CheckConnectionObservable> captor = ArgumentCaptor.forClass(CheckConnectionObservable.class);
+
+        rxFit.checkConnection();
+
+        PowerMockito.verifyStatic(times(1));
+        Observable.create(captor.capture());
+
+        CheckConnectionObservable checkConnectionObservable = captor.getValue();
+        assertNotNull(checkConnectionObservable);
     }
 
     // GoogleApiClientObservable
