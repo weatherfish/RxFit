@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "com.patloew.rxfitsample"
         minSdkVersion 9
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0.0"
     }
@@ -34,18 +34,18 @@ retrolambda {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile "com.android.support:design:24.2.1"
-    compile "com.android.support:recyclerview-v7:24.2.1"
-    compile "com.android.support:gridlayout-v7:24.2.1"
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile "com.android.support:design:25.0.0"
+    compile "com.android.support:recyclerview-v7:25.0.0"
+    compile "com.android.support:gridlayout-v7:25.0.0"
 
     compile project(':library')
-    //compile 'com.patloew.rxfit:rxfit:1.4.0'
+    //compile 'com.patloew.rxfit:rxfit:1.5.0'
 
-    compile 'io.reactivex:rxjava:1.2.0'
+    compile 'io.reactivex:rxjava:1.2.1'
     compile 'io.reactivex:rxandroid:1.2.1'
 
-    compile 'com.google.android.gms:play-services-fitness:9.6.1'
+    compile 'com.google.android.gms:play-services-fitness:9.8.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'

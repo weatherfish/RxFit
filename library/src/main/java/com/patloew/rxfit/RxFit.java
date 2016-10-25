@@ -42,6 +42,7 @@ public class RxFit {
 
     private final Ble ble = new Ble(this);
     private final Config config = new Config(this);
+    private final Goals goals = new Goals(this);
     private final History history = new History(this);
     private final Recording recording = new Recording(this);
     private final Sensors sensors = new Sensors(this);
@@ -97,6 +98,10 @@ public class RxFit {
 
     public Config config() {
         return config;
+    }
+
+    public Goals goals() {
+        return goals;
     }
 
     public History history() {

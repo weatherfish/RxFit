@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.5.0
+
+* Updated Play Services (9.8.0) and RxJava (1.2.1).
+* Added support for Goals API.
+
 ## Version 1.4.0
 
 * Updated Play Services (9.6.1) and RxJava (1.2.0).

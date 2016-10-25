@@ -54,7 +54,7 @@ A basic sample app is available in the `sample` project. You need to create an O
 The lib is available on jCenter. Add the following to your `build.gradle`:
 
 	dependencies {
-	    compile 'com.patloew.rxfit:rxfit:1.4.0'
+	    compile 'com.patloew.rxfit:rxfit:1.5.0'
 	}
 
 # Testing

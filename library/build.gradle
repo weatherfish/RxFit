@@ -4,18 +4,18 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.patloew.rxfit'
-version = '1.4.0'
+version = '1.5.0'
 project.archivesBaseName = 'rxfit'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 24
-        versionCode 7
-        versionName "1.4.0"
+        targetSdkVersion 25
+        versionCode 8
+        versionName "1.5.0"
     }
     buildTypes {
         release {
@@ -33,8 +33,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'io.reactivex:rxjava:1.2.0'
-    compile 'com.google.android.gms:play-services-fitness:9.6.1'
+    compile 'io.reactivex:rxjava:1.2.1'
+    compile 'com.google.android.gms:play-services-fitness:9.8.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'

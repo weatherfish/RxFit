@@ -12,6 +12,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.BleApi;
 import com.google.android.gms.fitness.ConfigApi;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.GoalsApi;
 import com.google.android.gms.fitness.HistoryApi;
 import com.google.android.gms.fitness.RecordingApi;
 import com.google.android.gms.fitness.SensorsApi;
@@ -44,6 +45,7 @@ public abstract class BaseOnSubscribeTest extends BaseTest {
 
     @Mock BleApi bleApi;
     @Mock ConfigApi configApi;
+    @Mock GoalsApi goalsApi;
     @Mock HistoryApi historyApi;
     @Mock RecordingApi recordingApi;
     @Mock SensorsApi sensorsApi;
@@ -54,6 +56,7 @@ public abstract class BaseOnSubscribeTest extends BaseTest {
         PowerMockito.mockStatic(Fitness.class);
         Whitebox.setInternalState(Fitness.class, bleApi);
         Whitebox.setInternalState(Fitness.class, configApi);
+        Whitebox.setInternalState(Fitness.class, goalsApi);
         Whitebox.setInternalState(Fitness.class, historyApi);
         Whitebox.setInternalState(Fitness.class, recordingApi);
         Whitebox.setInternalState(Fitness.class, sensorsApi);
