@@ -8,7 +8,7 @@ import com.google.android.gms.fitness.result.DataTypeResult;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -33,7 +33,7 @@ class ConfigCreateCustomDataTypeSingle extends BaseSingle<DataType> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super DataType> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<DataType> subscriber) {
         setupFitnessPendingResult(
                 Fitness.ConfigApi.createCustomDataType(apiClient, dataTypeCreateRequest),
                 SingleResultCallBack.get(subscriber, DataTypeResult::getDataType)

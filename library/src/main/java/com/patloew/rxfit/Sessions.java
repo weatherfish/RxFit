@@ -11,8 +11,8 @@ import com.google.android.gms.fitness.result.SessionReadResult;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.Single;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -117,7 +117,7 @@ public class Sessions {
 
     private Observable<Session> stopInternal(String identifier, Long timeout, TimeUnit timeUnit) {
         return Single.create(new SessionStopSingle(rxFit, identifier, timeout, timeUnit))
-                .flatMapObservable(Observable::from);
+                .flatMapObservable(Observable::fromIterable);
     }
 
 

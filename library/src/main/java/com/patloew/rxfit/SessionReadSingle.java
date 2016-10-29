@@ -7,7 +7,7 @@ import com.google.android.gms.fitness.result.SessionReadResult;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -32,7 +32,7 @@ class SessionReadSingle extends BaseSingle<SessionReadResult> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super SessionReadResult> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<SessionReadResult> subscriber) {
         setupFitnessPendingResult(
                 Fitness.SessionsApi.readSession(apiClient, sessionReadRequest),
                 SingleResultCallBack.get(subscriber)

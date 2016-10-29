@@ -6,7 +6,7 @@ import com.google.android.gms.fitness.Fitness;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -28,7 +28,7 @@ class ConfigDisableFitSingle extends BaseSingle<Status> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Status> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<Status> subscriber) {
         setupFitnessPendingResult(
                 Fitness.ConfigApi.disableFit(apiClient),
                 SingleResultCallBack.get(subscriber)

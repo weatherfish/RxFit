@@ -8,7 +8,7 @@ import com.google.android.gms.fitness.data.DataType;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -33,7 +33,7 @@ class BleListClaimedDevicesSingle extends BaseSingle<List<BleDevice>> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<BleDevice>> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<List<BleDevice>> subscriber) {
         setupFitnessPendingResult(
                 Fitness.BleApi.listClaimedBleDevices(apiClient),
                 SingleResultCallBack.get(subscriber, bleDevicesResult -> {

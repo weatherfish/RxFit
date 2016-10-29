@@ -11,7 +11,7 @@ import com.google.android.gms.fitness.request.StartBleScanRequest;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Subscriber;
+import io.reactivex.ObservableEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -42,10 +42,10 @@ class BleScanObservable extends BaseObservable<BleDevice> {
 
     @SuppressWarnings("MissingPermission")
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Subscriber<? super BleDevice> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final ObservableEmitter<BleDevice> subscriber) {
         bleScanCallback = new BleScanCallback() {
             @Override public void onDeviceFound(BleDevice bleDevice) { subscriber.onNext(bleDevice); }
-            @Override public void onScanStopped() { subscriber.onCompleted(); }
+            @Override public void onScanStopped() { subscriber.onComplete(); }
         };
 
         StartBleScanRequest.Builder startBleScanRequest = new StartBleScanRequest.Builder().setBleScanCallback(bleScanCallback);

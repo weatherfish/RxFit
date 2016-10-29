@@ -21,13 +21,14 @@ import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import rx.Observable;
-import rx.Single;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("com.google.android.gms.fitness.Fitness")
@@ -40,6 +41,7 @@ public class SensorsTest extends BaseTest {
         MockitoAnnotations.initMocks(this);
         PowerMockito.spy(Single.class);
         PowerMockito.mockStatic(Observable.class);
+        doReturn(100).when(Observable.class, "bufferSize");
         super.setup();
     }
 
@@ -132,7 +134,7 @@ public class SensorsTest extends BaseTest {
         assertNull(single.dataType);
         assertNoTimeoutSet(single);
 
-        single = captor.getAllValues().get(2);
+        single = captor.getAllValues().get(1);
         assertEquals(request, single.dataSourcesRequest);
         assertNull(single.dataType);
         assertTimeoutSet(single);
@@ -156,7 +158,7 @@ public class SensorsTest extends BaseTest {
         assertEquals(dataType, single.dataType);
         assertNoTimeoutSet(single);
 
-        single = captor.getAllValues().get(2);
+        single = captor.getAllValues().get(1);
         assertEquals(request, single.dataSourcesRequest);
         assertEquals(dataType, single.dataType);
         assertTimeoutSet(single);

@@ -10,7 +10,7 @@ import com.google.android.gms.fitness.result.ListSubscriptionsResult;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -35,7 +35,7 @@ class RecordingListSubscriptionsSingle extends BaseSingle<List<Subscription>> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<Subscription>> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<List<Subscription>> subscriber) {
         ResultCallback<ListSubscriptionsResult> resultCallback = SingleResultCallBack.get(subscriber, ListSubscriptionsResult::getSubscriptions);
 
         if(dataType == null) {

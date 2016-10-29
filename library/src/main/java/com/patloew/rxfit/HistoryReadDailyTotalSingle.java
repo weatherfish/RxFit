@@ -8,7 +8,7 @@ import com.google.android.gms.fitness.result.DailyTotalResult;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -33,7 +33,7 @@ class HistoryReadDailyTotalSingle extends BaseSingle<DataSet> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super DataSet> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<DataSet> subscriber) {
         setupFitnessPendingResult(
                 Fitness.HistoryApi.readDailyTotal(apiClient, dataType),
                 SingleResultCallBack.get(subscriber, DailyTotalResult::getTotal)

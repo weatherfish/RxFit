@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=master)](https://travis-ci.org/patloew/RxFit) [![codecov](https://codecov.io/gh/patloew/RxFit/branch/master/graph/badge.svg)](https://codecov.io/gh/patloew/RxFit) [ ![Download](https://api.bintray.com/packages/patloew/maven/RxFit/images/download.svg) ](https://bintray.com/patloew/maven/RxFit/_latestVersion) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RxFit-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3252) [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
 
-This library wraps the Fit API in [RxJava](https://github.com/ReactiveX/RxJava) Observables and Singles. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
+This library wraps the Fit API in [RxJava 2](https://github.com/ReactiveX/RxJava/tree/2.x) Observables and Singles. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
 
 # Usage
 
@@ -54,7 +54,7 @@ A basic sample app is available in the `sample` project. You need to create an O
 The lib is available on jCenter. Add the following to your `build.gradle`:
 
 	dependencies {
-	    compile 'com.patloew.rxfit:rxfit:1.5.0'
+	    compile 'com.patloew.rxfit:rxfit2:2.0.0'
 	}
 
 # Testing

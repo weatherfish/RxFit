@@ -20,8 +20,7 @@ import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import rx.Single;
-import rx.observers.TestSubscriber;
+import io.reactivex.Single;
 
 import static org.mockito.Mockito.when;
 
@@ -44,7 +43,6 @@ public class ConfigOnSubscribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void ConfigCreateCustomDataTypeObservable_Success() {
-        TestSubscriber<DataType> sub = new TestSubscriber<>();
         DataTypeCreateRequest dataTypeCreateRequest = Mockito.mock(DataTypeCreateRequest.class);
         DataTypeResult dataTypeResult = Mockito.mock(DataTypeResult.class);
         ConfigCreateCustomDataTypeSingle single = PowerMockito.spy(new ConfigCreateCustomDataTypeSingle(rxFit, dataTypeCreateRequest, null, null));
@@ -56,14 +54,12 @@ public class ConfigOnSubscribeTest extends BaseOnSubscribeTest {
         when(configApi.createCustomDataType(apiClient, dataTypeCreateRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, dataType);
+        assertSingleValue(Single.create(single).test(), dataType);
     }
 
     @Test
     public void ConfigCreateCustomDataTypeObservable_StatusException() {
-        TestSubscriber<DataType> sub = new TestSubscriber<>();
         DataTypeCreateRequest dataTypeCreateRequest = Mockito.mock(DataTypeCreateRequest.class);
         DataTypeResult dataTypeResult = Mockito.mock(DataTypeResult.class);
         ConfigCreateCustomDataTypeSingle single = PowerMockito.spy(new ConfigCreateCustomDataTypeSingle(rxFit, dataTypeCreateRequest, null, null));
@@ -75,16 +71,14 @@ public class ConfigOnSubscribeTest extends BaseOnSubscribeTest {
         when(configApi.createCustomDataType(apiClient, dataTypeCreateRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // ConfigDisableFitObservable
 
     @Test
     public void ConfigDisableFitObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         ConfigDisableFitSingle single = PowerMockito.spy(new ConfigDisableFitSingle(rxFit, null, null));
 
         setPendingResultValue(status);
@@ -92,14 +86,12 @@ public class ConfigOnSubscribeTest extends BaseOnSubscribeTest {
         when(configApi.disableFit(apiClient)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void ConfigDisableFitObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         ConfigDisableFitSingle single = PowerMockito.spy(new ConfigDisableFitSingle(rxFit, null, null));
 
         setPendingResultValue(status);
@@ -107,16 +99,14 @@ public class ConfigOnSubscribeTest extends BaseOnSubscribeTest {
         when(configApi.disableFit(apiClient)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // ConfigReadDataTypeObservable
 
     @Test
     public void ConfigReadDataTypeObservable_Success() {
-        TestSubscriber<DataType> sub = new TestSubscriber<>();
         String dataTypeName = "dataTypeName";
         DataTypeResult dataTypeResult = Mockito.mock(DataTypeResult.class);
         ConfigReadDataTypeSingle single = PowerMockito.spy(new ConfigReadDataTypeSingle(rxFit, dataTypeName, null, null));
@@ -128,14 +118,12 @@ public class ConfigOnSubscribeTest extends BaseOnSubscribeTest {
         when(configApi.readDataType(apiClient, dataTypeName)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, dataType);
+        assertSingleValue(Single.create(single).test(), dataType);
     }
 
     @Test
     public void ConfigReadDataTypeObservable_StatusException() {
-        TestSubscriber<DataType> sub = new TestSubscriber<>();
         String dataTypeName = "dataTypeName";
         DataTypeResult dataTypeResult = Mockito.mock(DataTypeResult.class);
         ConfigReadDataTypeSingle single = PowerMockito.spy(new ConfigReadDataTypeSingle(rxFit, dataTypeName, null, null));
@@ -147,9 +135,8 @@ public class ConfigOnSubscribeTest extends BaseOnSubscribeTest {
         when(configApi.readDataType(apiClient, dataTypeName)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
 }

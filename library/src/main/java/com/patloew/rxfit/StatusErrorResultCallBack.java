@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
-import rx.Subscriber;
+import io.reactivex.ObservableEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -22,9 +22,9 @@ import rx.Subscriber;
  * limitations under the License. */
 class StatusErrorResultCallBack implements ResultCallback<Status> {
 
-    private final Subscriber subscriber;
+    private final ObservableEmitter subscriber;
 
-    StatusErrorResultCallBack(@NonNull Subscriber subscriber) {
+    StatusErrorResultCallBack(@NonNull ObservableEmitter subscriber) {
         this.subscriber = subscriber;
     }
 

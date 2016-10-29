@@ -27,9 +27,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.Single;
-import rx.observers.TestSubscriber;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.observers.TestObserver;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -54,7 +54,6 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void BleClaimDeviceObservable_BleDevice_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         BleClaimDeviceSingle single = PowerMockito.spy(new BleClaimDeviceSingle(rxFit, bleDevice, null, null, null));
 
         setPendingResultValue(status);
@@ -62,14 +61,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.claimBleDevice(apiClient, bleDevice)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void BleClaimDeviceObservable_DeviceAddress_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         String deviceAddress = "deviceAddress";
         BleClaimDeviceSingle single = PowerMockito.spy(new BleClaimDeviceSingle(rxFit, null, deviceAddress, null, null));
 
@@ -78,14 +75,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.claimBleDevice(apiClient, deviceAddress)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void BleClaimDeviceObservable_BleDevice_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         BleClaimDeviceSingle single = PowerMockito.spy(new BleClaimDeviceSingle(rxFit, bleDevice, null, null, null));
 
         setPendingResultValue(status);
@@ -93,14 +88,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.claimBleDevice(apiClient, bleDevice)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void BleClaimDeviceObservable_DeviceAddress_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         String deviceAddress = "deviceAddress";
         BleClaimDeviceSingle single = PowerMockito.spy(new BleClaimDeviceSingle(rxFit, null, deviceAddress, null, null));
 
@@ -109,9 +102,8 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.claimBleDevice(apiClient, deviceAddress)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
 
@@ -119,7 +111,6 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void BleUnclaimDeviceObservable_BleDevice_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         BleUnclaimDeviceSingle single = PowerMockito.spy(new BleUnclaimDeviceSingle(rxFit, bleDevice, null, null, null));
 
         setPendingResultValue(status);
@@ -127,14 +118,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.unclaimBleDevice(apiClient, bleDevice)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void BleUnclaimDeviceObservable_DeviceAddress_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         String deviceAddress = "deviceAddress";
         BleUnclaimDeviceSingle single = PowerMockito.spy(new BleUnclaimDeviceSingle(rxFit, null, deviceAddress, null, null));
 
@@ -143,14 +132,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.unclaimBleDevice(apiClient, deviceAddress)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void BleUnclaimDeviceObservable_BleDevice_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         BleUnclaimDeviceSingle single = PowerMockito.spy(new BleUnclaimDeviceSingle(rxFit, bleDevice, null, null, null));
 
         setPendingResultValue(status);
@@ -158,14 +145,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.unclaimBleDevice(apiClient, bleDevice)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void BleUnclaimDeviceObservable_DeviceAddress_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         String deviceAddress = "deviceAddress";
         BleUnclaimDeviceSingle single = PowerMockito.spy(new BleUnclaimDeviceSingle(rxFit, null, deviceAddress, null, null));
 
@@ -174,16 +159,14 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.unclaimBleDevice(apiClient, deviceAddress)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // BleListClaimedDevicesObservable
 
     @Test
     public void BleListClaimedDevicesObservable_WithDataType_Success() {
-        TestSubscriber<List<BleDevice>> sub = new TestSubscriber<>();
         BleListClaimedDevicesSingle single = PowerMockito.spy(new BleListClaimedDevicesSingle(rxFit, dataType, null, null));
 
         BleDevicesResult bleDevicesResult = Mockito.mock(BleDevicesResult.class);
@@ -199,14 +182,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.listClaimedBleDevices(apiClient)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, bleDeviceList);
+        assertSingleValue(Single.create(single).test(), bleDeviceList);
     }
 
     @Test
     public void BleListClaimedDevicesObservable_WithDataType_StatusException() {
-        TestSubscriber<List<BleDevice>> sub = new TestSubscriber<>();
         BleListClaimedDevicesSingle single = PowerMockito.spy(new BleListClaimedDevicesSingle(rxFit, dataType, null, null));
 
         BleDevicesResult bleDevicesResult = Mockito.mock(BleDevicesResult.class);
@@ -222,14 +203,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.listClaimedBleDevices(apiClient)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void BleListClaimedDevicesObservable_Success() {
-        TestSubscriber<List<BleDevice>> sub = new TestSubscriber<>();
         BleListClaimedDevicesSingle single = PowerMockito.spy(new BleListClaimedDevicesSingle(rxFit, null, null, null));
 
         BleDevicesResult bleDevicesResult = Mockito.mock(BleDevicesResult.class);
@@ -245,14 +224,12 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.listClaimedBleDevices(apiClient)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, bleDeviceList);
+        assertSingleValue(Single.create(single).test(), bleDeviceList);
     }
 
     @Test
     public void BleListClaimedDevicesObservable_StatusException() {
-        TestSubscriber<List<BleDevice>> sub = new TestSubscriber<>();
         BleListClaimedDevicesSingle single = PowerMockito.spy(new BleListClaimedDevicesSingle(rxFit, null, null, null));
 
         BleDevicesResult bleDevicesResult = Mockito.mock(BleDevicesResult.class);
@@ -268,9 +245,8 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(bleApi.listClaimedBleDevices(apiClient)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // BleScanObservable
@@ -278,7 +254,6 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
     @SuppressWarnings("MissingPermission")
     @Test
     public void BleScanObservable_Success() {
-        TestSubscriber<BleDevice> sub = new TestSubscriber<>();
         BleScanObservable observable = PowerMockito.spy(new BleScanObservable(rxFit, null, null, null, null));
 
         setPendingResultValue(status);
@@ -287,21 +262,20 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(apiClient.isConnected()).thenReturn(true);
 
         setupBaseObservableSuccess(observable);
-        Observable.create(observable).subscribe(sub);
+        TestObserver<BleDevice> sub = Observable.create(observable).test();
         getSubscriber(observable, apiClient).onNext(bleDevice);
 
         verify(bleApi, never()).stopBleScan(Matchers.any(GoogleApiClient.class), Matchers.any(BleScanCallback.class));
-        sub.unsubscribe();
+        sub.dispose();
         verify(bleApi).stopBleScan(Matchers.any(GoogleApiClient.class), Matchers.any(BleScanCallback.class));
 
-        sub.assertNoTerminalEvent();
+        sub.assertNotTerminated();
         sub.assertValue(bleDevice);
     }
 
     @SuppressWarnings("MissingPermission")
     @Test
     public void BleScanObservable_StatusException() {
-        TestSubscriber<BleDevice> sub = new TestSubscriber<>();
         BleScanObservable observable = PowerMockito.spy(new BleScanObservable(rxFit, null, null, null, null));
 
         setPendingResultValue(status);
@@ -310,23 +284,20 @@ public class BleOnSubscribeTest extends BaseOnSubscribeTest {
         when(apiClient.isConnected()).thenReturn(true);
 
         setupBaseObservableSuccess(observable);
-        Observable.create(observable).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Observable.create(observable).test(), StatusException.class);
     }
 
     @SuppressWarnings("MissingPermission")
     @Test
     public void BleScanObservable_SecurityException() throws Exception {
-        TestSubscriber<BleDevice> sub = new TestSubscriber<>();
 
         PowerMockito.doThrow(new SecurityException("Missing Bluetooth Admin permission")).when(bleApi).startBleScan(Matchers.any(GoogleApiClient.class), Matchers.any(StartBleScanRequest.class));
 
         BleScanObservable observable = PowerMockito.spy(new BleScanObservable(rxFit, null, null, null, null));
 
         setupBaseObservableSuccess(observable);
-        Observable.create(observable).subscribe(sub);
 
-        assertError(sub, SecurityException.class);
+        assertError(Observable.create(observable).test(), SecurityException.class);
     }
 }

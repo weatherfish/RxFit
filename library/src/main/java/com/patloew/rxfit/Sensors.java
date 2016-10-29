@@ -12,8 +12,8 @@ import com.google.android.gms.fitness.request.SensorRequest;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.Single;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -98,7 +98,7 @@ public class Sensors {
 
     private Observable<DataSource> findDataSourcesInternal(DataSourcesRequest dataSourcesRequest, DataType dataType, Long timeout, TimeUnit timeUnit) {
         return Single.create(new SensorsFindDataSourcesSingle(rxFit, dataSourcesRequest, dataType, timeout, timeUnit))
-                .flatMapObservable(Observable::from);
+                .flatMapObservable(Observable::fromIterable);
     }
 
 }

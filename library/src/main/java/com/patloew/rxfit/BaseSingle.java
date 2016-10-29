@@ -15,9 +15,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import rx.Single;
-import rx.SingleSubscriber;
-import rx.subscriptions.Subscriptions;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 
 /* Copyright (C) 2015 Michał Charmas (http://blog.charmas.pl)
  *
@@ -38,10 +37,10 @@ import rx.subscriptions.Subscriptions;
  * FILE MODIFIED by Patrick Löwenstein, 2016
  *
  */
-abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> {
+abstract class BaseSingle<T> extends BaseRx<T> implements SingleOnSubscribe<T> {
     private final boolean handleResolution;
 
-    final Map<GoogleApiClient, SingleSubscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();
+    final Map<GoogleApiClient, SingleEmitter<T>> subscriptionInfoMap = new ConcurrentHashMap<>();
 
     protected BaseSingle(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -54,7 +53,7 @@ abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> 
     }
 
     @Override
-    public final void call(SingleSubscriber<? super T> subscriber) {
+    public final void subscribe(SingleEmitter<T> subscriber) throws Exception {
         final GoogleApiClient apiClient = createApiClient(new ApiClientConnectionCallbacks(subscriber));
         subscriptionInfoMap.put(apiClient, subscriber);
 
@@ -64,21 +63,21 @@ abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> 
             subscriber.onError(ex);
         }
 
-        subscriber.add(Subscriptions.create(() -> {
+        subscriber.setCancellable(() -> {
             if (apiClient.isConnected() || apiClient.isConnecting()) {
                 onUnsubscribed(apiClient);
                 apiClient.disconnect();
             }
 
             subscriptionInfoMap.remove(apiClient);
-        }));
+        });
     }
 
-    protected abstract void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super T> subscriber);
+    protected abstract void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<T> subscriber);
 
     protected final void handleResolutionResult(int resultCode, ConnectionResult connectionResult) {
-        for (Map.Entry<GoogleApiClient, SingleSubscriber<? super T>> entry : subscriptionInfoMap.entrySet()) {
-            if (!entry.getValue().isUnsubscribed()) {
+        for (Map.Entry<GoogleApiClient, SingleEmitter<T>> entry : subscriptionInfoMap.entrySet()) {
+            if (!entry.getValue().isDisposed()) {
                 if (resultCode == Activity.RESULT_OK) {
                     try {
                         entry.getKey().connect();
@@ -94,11 +93,11 @@ abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> 
 
     protected class ApiClientConnectionCallbacks extends BaseRx.ApiClientConnectionCallbacks {
 
-        final protected SingleSubscriber<? super T> subscriber;
+        final protected SingleEmitter<T> subscriber;
 
         private GoogleApiClient apiClient;
 
-        private ApiClientConnectionCallbacks(SingleSubscriber<? super T> subscriber) {
+        private ApiClientConnectionCallbacks(SingleEmitter<T> subscriber) {
             this.subscriber = subscriber;
         }
 

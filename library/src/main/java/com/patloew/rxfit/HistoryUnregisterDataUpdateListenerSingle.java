@@ -8,7 +8,7 @@ import com.google.android.gms.fitness.Fitness;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -33,7 +33,7 @@ class HistoryUnregisterDataUpdateListenerSingle extends BaseSingle<Status> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<Status> subscriber) {
         setupFitnessPendingResult(
                 Fitness.HistoryApi.unregisterDataUpdateListener(apiClient, pendingIntent),
                 SingleResultCallBack.get(subscriber)

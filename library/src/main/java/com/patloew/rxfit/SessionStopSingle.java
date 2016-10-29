@@ -8,7 +8,7 @@ import com.google.android.gms.fitness.result.SessionStopResult;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -33,7 +33,7 @@ class SessionStopSingle extends BaseSingle<List<Session>> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<Session>> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<List<Session>> subscriber) {
         setupFitnessPendingResult(
                 Fitness.SessionsApi.stopSession(apiClient, identifier),
                 SingleResultCallBack.get(subscriber, SessionStopResult::getSessions)

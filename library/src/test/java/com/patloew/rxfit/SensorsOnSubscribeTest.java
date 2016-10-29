@@ -30,9 +30,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.Single;
-import rx.observers.TestSubscriber;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.observers.TestObserver;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -59,7 +59,6 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void SensorsAddDataPointIntentObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
         SensorsAddDataPointIntentSingle single = PowerMockito.spy(new SensorsAddDataPointIntentSingle(rxFit, sensorRequest, pendingIntent, null, null));
 
@@ -68,14 +67,12 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.add(apiClient, sensorRequest, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void SensorsAddDataPointIntentObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
         SensorsAddDataPointIntentSingle single = PowerMockito.spy(new SensorsAddDataPointIntentSingle(rxFit, sensorRequest, pendingIntent, null, null));
 
@@ -84,9 +81,8 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.add(apiClient, sensorRequest, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
 
@@ -94,7 +90,6 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void SensorsRemoveDataPointIntentObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
         SensorsRemoveDataPointIntentSingle single = PowerMockito.spy(new SensorsRemoveDataPointIntentSingle(rxFit, pendingIntent, null, null));
 
@@ -103,14 +98,12 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.remove(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void SensorsRemoveDataPointIntentObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
         SensorsRemoveDataPointIntentSingle single = PowerMockito.spy(new SensorsRemoveDataPointIntentSingle(rxFit, pendingIntent, null, null));
 
@@ -119,16 +112,14 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.remove(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // SensorsDataPointObservable
 
     @Test
     public void SensorsDataPointObservable_Success() {
-        TestSubscriber<Object> sub = new TestSubscriber<>();
         DataPoint dataPoint = Mockito.mock(DataPoint.class);
         SensorsDataPointObservable observable = PowerMockito.spy(new SensorsDataPointObservable(rxFit, sensorRequest, null, null));
 
@@ -138,20 +129,19 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(apiClient.isConnected()).thenReturn(true);
 
         setupBaseObservableSuccess(observable);
-        Observable.create(observable).subscribe(sub);
+        TestObserver<DataPoint> sub = Observable.create(observable).test();
         getSubscriber(observable, apiClient).onNext(dataPoint);
 
         verify(sensorsApi, never()).remove(Matchers.any(GoogleApiClient.class), Matchers.any(OnDataPointListener.class));
-        sub.unsubscribe();
+        sub.dispose();
         verify(sensorsApi).remove(Matchers.any(GoogleApiClient.class), Matchers.any(OnDataPointListener.class));
 
-        sub.assertNoTerminalEvent();
+        sub.assertNotTerminated();
         sub.assertValue(dataPoint);
     }
 
     @Test
     public void SensorsDataPointObservable_StatusException() {
-        TestSubscriber<DataPoint> sub = new TestSubscriber<>();
         SensorsDataPointObservable observable = PowerMockito.spy(new SensorsDataPointObservable(rxFit, sensorRequest, null, null));
 
         setPendingResultValue(status);
@@ -159,16 +149,14 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.add(Matchers.any(GoogleApiClient.class), Matchers.any(SensorRequest.class), Matchers.any(OnDataPointListener.class))).thenReturn(pendingResult);
 
         setupBaseObservableSuccess(observable);
-        Observable.create(observable).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Observable.create(observable).test(), StatusException.class);
     }
 
     // SensorsFindDataSourcesObservable
 
     @Test
     public void SensorsFindDataSourcesObservable_Success() {
-        TestSubscriber<List<DataSource>> sub = new TestSubscriber<>();
         DataSourcesRequest dataSourcesRequest = Mockito.mock(DataSourcesRequest.class);
         DataSourcesResult dataSourcesResult = Mockito.mock(DataSourcesResult.class);
         SensorsFindDataSourcesSingle single = PowerMockito.spy(new SensorsFindDataSourcesSingle(rxFit, dataSourcesRequest, null, null, null));
@@ -184,14 +172,12 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.findDataSources(apiClient, dataSourcesRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, dataSourceList);
+        assertSingleValue(Single.create(single).test(), dataSourceList);
     }
 
     @Test
     public void SensorsFindDataSourcesObservable_StatusException() {
-        TestSubscriber<List<DataSource>> sub = new TestSubscriber<>();
         DataSourcesRequest dataSourcesRequest = Mockito.mock(DataSourcesRequest.class);
         DataSourcesResult dataSourcesResult = Mockito.mock(DataSourcesResult.class);
         SensorsFindDataSourcesSingle single = PowerMockito.spy(new SensorsFindDataSourcesSingle(rxFit, dataSourcesRequest, null, null, null));
@@ -207,14 +193,12 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.findDataSources(apiClient, dataSourcesRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void SensorsFindDataSourcesObservable_WithDataType_Success() {
-        TestSubscriber<List<DataSource>> sub = new TestSubscriber<>();
         DataSourcesRequest dataSourcesRequest = Mockito.mock(DataSourcesRequest.class);
         DataSourcesResult dataSourcesResult = Mockito.mock(DataSourcesResult.class);
         SensorsFindDataSourcesSingle single = PowerMockito.spy(new SensorsFindDataSourcesSingle(rxFit, dataSourcesRequest, dataType, null, null));
@@ -230,14 +214,12 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.findDataSources(apiClient, dataSourcesRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, dataSourceList);
+        assertSingleValue(Single.create(single).test(), dataSourceList);
     }
 
     @Test
     public void SensorsFindDataSourcesObservable_WithDataType_StatusException() {
-        TestSubscriber<List<DataSource>> sub = new TestSubscriber<>();
         DataSourcesRequest dataSourcesRequest = Mockito.mock(DataSourcesRequest.class);
         DataSourcesResult dataSourcesResult = Mockito.mock(DataSourcesResult.class);
         SensorsFindDataSourcesSingle single = PowerMockito.spy(new SensorsFindDataSourcesSingle(rxFit, dataSourcesRequest, dataType, null, null));
@@ -253,8 +235,7 @@ public class SensorsOnSubscribeTest extends BaseOnSubscribeTest {
         when(sensorsApi.findDataSources(apiClient, dataSourcesRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 }

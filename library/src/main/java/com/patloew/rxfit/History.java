@@ -15,8 +15,8 @@ import com.google.android.gms.fitness.result.DataReadResult;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.Single;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -105,7 +105,7 @@ public class History {
 
     private Observable<Bucket> readBucketsInternal(DataReadRequest dataReadRequest, Long timeout, TimeUnit timeUnit) {
         return readInternal(dataReadRequest, timeout, timeUnit)
-                .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getBuckets()));
+                .flatMapObservable(dataReadResult -> Observable.fromIterable(dataReadResult.getBuckets()));
     }
 
     public Observable<DataSet> readDataSets(@NonNull DataReadRequest dataReadRequest) {
@@ -118,7 +118,7 @@ public class History {
 
     private Observable<DataSet> readDataSetsInternal(DataReadRequest dataReadRequest, Long timeout, TimeUnit timeUnit) {
         return readInternal(dataReadRequest, timeout, timeUnit)
-                .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getDataSets()));
+                .flatMapObservable(dataReadResult -> Observable.fromIterable(dataReadResult.getDataSets()));
     }
 
 

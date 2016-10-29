@@ -8,7 +8,7 @@ import com.google.android.gms.fitness.request.SensorRequest;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Subscriber;
+import io.reactivex.ObservableEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -34,7 +34,7 @@ class SensorsDataPointObservable extends BaseObservable<DataPoint> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Subscriber<? super DataPoint> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final ObservableEmitter<DataPoint> subscriber) {
         dataPointListener = subscriber::onNext;
 
         setupFitnessPendingResult(

@@ -20,7 +20,7 @@ import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import rx.Single;
+import io.reactivex.Single;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
@@ -57,7 +57,7 @@ public class RecordingTest extends BaseTest {
         assertNull(single.dataType);
         assertNoTimeoutSet(single);
 
-        single = captor.getAllValues().get(2);
+        single = captor.getAllValues().get(1);
         assertNull(single.dataType);
         assertTimeoutSet(single);
     }
@@ -78,7 +78,7 @@ public class RecordingTest extends BaseTest {
         assertEquals(dataType, single.dataType);
         assertNoTimeoutSet(single);
 
-        single = captor.getAllValues().get(2);
+        single = captor.getAllValues().get(1);
         assertEquals(dataType, single.dataType);
         assertTimeoutSet(single);
     }
