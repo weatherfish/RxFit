@@ -1,7 +1,5 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
@@ -38,16 +36,7 @@ class RecordingListSubscriptionsSingle extends BaseSingle<List<Subscription>> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<Subscription>> subscriber) {
-        ResultCallback<ListSubscriptionsResult> resultCallback = new ResultCallback<ListSubscriptionsResult>() {
-            @Override
-            public void onResult(@NonNull ListSubscriptionsResult listSubscriptionsResult) {
-                if(!listSubscriptionsResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(listSubscriptionsResult.getStatus()));
-                } else {
-                    subscriber.onSuccess(listSubscriptionsResult.getSubscriptions());
-                }
-            }
-        };
+        ResultCallback<ListSubscriptionsResult> resultCallback = SingleResultCallBack.get(subscriber, ListSubscriptionsResult::getSubscriptions);
 
         if(dataType == null) {
             setupFitnessPendingResult(Fitness.RecordingApi.listSubscriptions(apiClient), resultCallback);

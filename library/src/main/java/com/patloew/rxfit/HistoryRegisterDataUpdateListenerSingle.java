@@ -3,7 +3,6 @@ package com.patloew.rxfit;
 import android.app.PendingIntent;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataSource;
@@ -44,8 +43,9 @@ class HistoryRegisterDataUpdateListenerSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        ResultCallback<Status> resultCallback = new StatusResultCallBack(subscriber);
-
-        setupFitnessPendingResult(Fitness.HistoryApi.registerDataUpdateListener(apiClient, request), resultCallback);
+        setupFitnessPendingResult(
+                Fitness.HistoryApi.registerDataUpdateListener(apiClient, request),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }

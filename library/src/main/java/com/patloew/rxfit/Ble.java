@@ -7,12 +7,10 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.data.BleDevice;
 import com.google.android.gms.fitness.data.DataType;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func1;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -77,12 +75,7 @@ public class Ble {
 
     private Observable<BleDevice> getClaimedDeviceListInternal(DataType dataType, Long timeout, TimeUnit timeUnit) {
         return Single.create(new BleListClaimedDevicesSingle(rxFit, dataType, timeout, timeUnit))
-                .flatMapObservable(new Func1<List<BleDevice>, Observable<BleDevice>>() {
-                    @Override
-                    public Observable<BleDevice> call(List<BleDevice> bleDevices) {
-                        return Observable.from(bleDevices);
-                    }
-                });
+                .flatMapObservable(Observable::from);
     }
 
     // scan

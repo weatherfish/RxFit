@@ -1,9 +1,6 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -37,15 +34,9 @@ class HistoryReadDailyTotalSingle extends BaseSingle<DataSet> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super DataSet> subscriber) {
-        setupFitnessPendingResult(Fitness.HistoryApi.readDailyTotal(apiClient, dataType), new ResultCallback<DailyTotalResult>() {
-            @Override
-            public void onResult(@NonNull DailyTotalResult dailyTotalResult) {
-                if (!dailyTotalResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(dailyTotalResult.getStatus()));
-                } else {
-                    subscriber.onSuccess(dailyTotalResult.getTotal());
-                }
-            }
-        });
+        setupFitnessPendingResult(
+                Fitness.HistoryApi.readDailyTotal(apiClient, dataType),
+                SingleResultCallBack.get(subscriber, DailyTotalResult::getTotal)
+        );
     }
 }

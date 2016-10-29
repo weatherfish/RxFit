@@ -1,15 +1,11 @@
 package com.patloew.rxfit;
 
-import android.app.PendingIntent;
 import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.GoalsReadRequest;
-import com.google.android.gms.fitness.request.SensorRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,9 +22,7 @@ import rx.Observable;
 import rx.Single;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.times;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("com.google.android.gms.fitness.Fitness")

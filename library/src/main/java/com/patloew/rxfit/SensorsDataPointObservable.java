@@ -1,10 +1,6 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.request.OnDataPointListener;
@@ -39,21 +35,12 @@ class SensorsDataPointObservable extends BaseObservable<DataPoint> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Subscriber<? super DataPoint> subscriber) {
-        dataPointListener = new OnDataPointListener() {
-            @Override
-            public void onDataPoint(DataPoint dataPoint) {
-                subscriber.onNext(dataPoint);
-            }
-        };
+        dataPointListener = subscriber::onNext;
 
-        setupFitnessPendingResult(Fitness.SensorsApi.add(apiClient, sensorRequest, dataPointListener), new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
-                if (!status.isSuccess()) {
-                    subscriber.onError(new StatusException(status));
-                }
-            }
-        });
+        setupFitnessPendingResult(
+                Fitness.SensorsApi.add(apiClient, sensorRequest, dataPointListener),
+                new StatusErrorResultCallBack(subscriber)
+        );
     }
 
     @Override

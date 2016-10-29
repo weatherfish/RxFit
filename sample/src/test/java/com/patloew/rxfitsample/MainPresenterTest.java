@@ -2,7 +2,6 @@ package com.patloew.rxfitsample;
 
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.request.DataReadRequest;
-import com.google.android.gms.fitness.result.DataReadResult;
 import com.patloew.rxfit.History;
 import com.patloew.rxfit.RxFit;
 
@@ -16,10 +15,9 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import rx.Single;
+import rx.Observable;
 
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -47,7 +45,7 @@ public class MainPresenterTest {
     @Mock RxFit rxFit;
     @Mock History history;
 
-    @Mock DataReadResult dataReadResult;
+    @Mock Bucket bucket;
 
     @Mock MainView mainView;
 
@@ -65,8 +63,7 @@ public class MainPresenterTest {
 
     @Test
     public void testNoResults() {
-        doReturn(new ArrayList<Bucket>()).when(dataReadResult).getBuckets();
-        doReturn(Single.just(dataReadResult)).when(history).read(Matchers.any(DataReadRequest.class));
+        doReturn(Observable.empty()).when(history).readBuckets(Matchers.any(DataReadRequest.class));
 
         mainPresenter.getFitnessData();
 

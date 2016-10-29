@@ -1,14 +1,10 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataSourcesRequest;
-import com.google.android.gms.fitness.result.DataSourcesResult;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -41,19 +37,15 @@ class SensorsFindDataSourcesSingle extends BaseSingle<List<DataSource>> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<DataSource>> subscriber) {
-        setupFitnessPendingResult(Fitness.SensorsApi.findDataSources(apiClient, dataSourcesRequest), new ResultCallback<DataSourcesResult>() {
-            @Override
-            public void onResult(@NonNull DataSourcesResult dataSourcesResult) {
-                if (!dataSourcesResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(dataSourcesResult.getStatus()));
-                } else {
+        setupFitnessPendingResult(
+                Fitness.SensorsApi.findDataSources(apiClient, dataSourcesRequest),
+                SingleResultCallBack.get(subscriber, dataSourcesResult -> {
                     if(dataType == null) {
-                        subscriber.onSuccess(dataSourcesResult.getDataSources());
+                        return dataSourcesResult.getDataSources();
                     } else {
-                        subscriber.onSuccess(dataSourcesResult.getDataSources(dataType));
+                        return dataSourcesResult.getDataSources(dataType);
                     }
-                }
-            }
-        });
+                })
+        );
     }
 }

@@ -1,9 +1,6 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.result.DataTypeResult;
@@ -36,15 +33,9 @@ class ConfigReadDataTypeSingle extends BaseSingle<DataType> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super DataType> subscriber) {
-        setupFitnessPendingResult(Fitness.ConfigApi.readDataType(apiClient, dataTypeName), new ResultCallback<DataTypeResult>() {
-            @Override
-            public void onResult(@NonNull DataTypeResult dataTypeResult) {
-                if (!dataTypeResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(dataTypeResult.getStatus()));
-                } else {
-                    subscriber.onSuccess(dataTypeResult.getDataType());
-                }
-            }
-        });
+        setupFitnessPendingResult(
+                Fitness.ConfigApi.readDataType(apiClient, dataTypeName),
+                SingleResultCallBack.get(subscriber, DataTypeResult::getDataType)
+        );
     }
 }

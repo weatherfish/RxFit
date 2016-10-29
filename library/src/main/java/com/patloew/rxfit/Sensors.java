@@ -10,12 +10,10 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.SensorRequest;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func1;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -99,12 +97,8 @@ public class Sensors {
     }
 
     private Observable<DataSource> findDataSourcesInternal(DataSourcesRequest dataSourcesRequest, DataType dataType, Long timeout, TimeUnit timeUnit) {
-        return Single.create(new SensorsFindDataSourcesSingle(rxFit, dataSourcesRequest, dataType, timeout, timeUnit)).flatMapObservable(new Func1<List<DataSource>, Observable<? extends DataSource>>() {
-            @Override
-            public Observable<? extends DataSource> call(List<DataSource> dataSources) {
-                return Observable.from(dataSources);
-            }
-        });
+        return Single.create(new SensorsFindDataSourcesSingle(rxFit, dataSourcesRequest, dataType, timeout, timeUnit))
+                .flatMapObservable(Observable::from);
     }
 
 }

@@ -64,7 +64,7 @@ public class ResolutionActivity extends Activity {
 
     private void setResolutionResultAndFinish(int resultCode) {
         resolutionShown = false;
-        BaseRx.onResolutionResult(resultCode, (ConnectionResult) getIntent().getParcelableExtra(ARG_CONNECTION_RESULT));
+        BaseRx.onResolutionResult(resultCode, getIntent().getParcelableExtra(ARG_CONNECTION_RESULT));
         finish();
     }
 

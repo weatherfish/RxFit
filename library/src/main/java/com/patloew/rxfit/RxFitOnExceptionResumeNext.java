@@ -36,38 +36,22 @@ public class RxFitOnExceptionResumeNext {
     private RxFitOnExceptionResumeNext() { }
 
     public static <T, R extends T> Observable.Transformer<T, T> with(final Observable<R> other) {
-        return new Observable.Transformer<T, T>() {
-            @Override
-            public Observable<T> call(Observable<T> source) {
-                return source.onErrorResumeNext(new Func1<Throwable, Observable<R>>() {
-                    @Override
-                    public Observable<R> call(Throwable throwable) {
-                        if (!(throwable instanceof Exception) || (throwable instanceof GoogleAPIConnectionException && ((GoogleAPIConnectionException) throwable).wasResolutionUnsuccessful())) {
-                            throw Exceptions.propagate(throwable);
-                        }
-
-                        return other;
-                    }
-                });
-            }
-        };
+        return source -> source.onErrorResumeNext(getThrowableMapper(other));
     }
 
     public static <T, R extends T> Single.Transformer<T, T> with(final Single<R> other) {
-        return new Single.Transformer<T, T>() {
-            @Override
-            public Single<T> call(Single<T> source) {
-                return source.onErrorResumeNext(new Func1<Throwable, Single<R>>() {
-                    @Override
-                    public Single<R> call(Throwable throwable) {
-                        if (!(throwable instanceof Exception) || (throwable instanceof GoogleAPIConnectionException && ((GoogleAPIConnectionException) throwable).wasResolutionUnsuccessful())) {
-                            throw Exceptions.propagate(throwable);
-                        }
+        return source -> source.onErrorResumeNext(getThrowableMapper(other));
+    }
 
-                        return other;
-                    }
-                });
-            }
+    private static <R> Func1<Throwable, R> getThrowableMapper(R other) {
+        return throwable -> {
+            if(shouldPropagateThrowable(throwable)) { throw Exceptions.propagate(throwable); }
+            return other;
         };
+    }
+
+    private static boolean shouldPropagateThrowable(Throwable throwable) {
+        return !(throwable instanceof Exception) ||
+                (throwable instanceof GoogleAPIConnectionException && ((GoogleAPIConnectionException) throwable).wasResolutionUnsuccessful());
     }
 }

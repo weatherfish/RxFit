@@ -24,15 +24,17 @@ import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import rx.Observable;
 import rx.Single;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("com.google.android.gms.fitness.Fitness")
-@PrepareOnlyThisForTest({ Single.class, ContextCompat.class, Fitness.class, Status.class, ConnectionResult.class, DataType.class, DataSet.class })
+@PrepareOnlyThisForTest({ Observable.class, Single.class, ContextCompat.class, Fitness.class, Status.class, ConnectionResult.class, DataType.class, DataSet.class })
 public class HistoryTest extends BaseTest {
 
     @Override
@@ -40,9 +42,9 @@ public class HistoryTest extends BaseTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         PowerMockito.spy(Single.class);
+        PowerMockito.mockStatic(Observable.class);
         super.setup();
     }
-
 
     // Data Delete Request
 
@@ -128,6 +130,50 @@ public class HistoryTest extends BaseTest {
         assertNoTimeoutSet(single);
 
         single = captor.getAllValues().get(1);
+        assertEquals(request, single.dataReadRequest);
+        assertTimeoutSet(single);
+    }
+
+    // Read Buckets
+
+    @Test
+    public void History_ReadBuckets() throws Exception {
+        ArgumentCaptor<HistoryReadDataSingle> captor = ArgumentCaptor.forClass(HistoryReadDataSingle.class);
+
+        final DataReadRequest request = Mockito.mock(DataReadRequest.class);
+        rxFit.history().readBuckets(request);
+        rxFit.history().readBuckets(request, TIMEOUT_TIME, TIMEOUT_TIMEUNIT);
+
+        PowerMockito.verifyStatic(atLeast(2));
+        Single.create(captor.capture());
+
+        HistoryReadDataSingle single = captor.getAllValues().get(0);
+        assertEquals(request, single.dataReadRequest);
+        assertNoTimeoutSet(single);
+
+        single = captor.getAllValues().get(2);
+        assertEquals(request, single.dataReadRequest);
+        assertTimeoutSet(single);
+    }
+
+    // Read DataSets
+
+    @Test
+    public void History_ReadDataSets() throws Exception {
+        ArgumentCaptor<HistoryReadDataSingle> captor = ArgumentCaptor.forClass(HistoryReadDataSingle.class);
+
+        final DataReadRequest request = Mockito.mock(DataReadRequest.class);
+        rxFit.history().readDataSets(request);
+        rxFit.history().readDataSets(request, TIMEOUT_TIME, TIMEOUT_TIMEUNIT);
+
+        PowerMockito.verifyStatic(atLeast(2));
+        Single.create(captor.capture());
+
+        HistoryReadDataSingle single = captor.getAllValues().get(0);
+        assertEquals(request, single.dataReadRequest);
+        assertNoTimeoutSet(single);
+
+        single = captor.getAllValues().get(2);
         assertEquals(request, single.dataReadRequest);
         assertTimeoutSet(single);
     }

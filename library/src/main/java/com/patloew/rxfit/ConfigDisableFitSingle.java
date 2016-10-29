@@ -29,6 +29,9 @@ class ConfigDisableFitSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Status> subscriber) {
-        setupFitnessPendingResult(Fitness.ConfigApi.disableFit(apiClient), new StatusResultCallBack(subscriber));
+        setupFitnessPendingResult(
+                Fitness.ConfigApi.disableFit(apiClient),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }

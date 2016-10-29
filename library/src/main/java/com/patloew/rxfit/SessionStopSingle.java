@@ -1,9 +1,6 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.result.SessionStopResult;
@@ -37,15 +34,9 @@ class SessionStopSingle extends BaseSingle<List<Session>> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<Session>> subscriber) {
-        setupFitnessPendingResult(Fitness.SessionsApi.stopSession(apiClient, identifier), new ResultCallback<SessionStopResult>() {
-            @Override
-            public void onResult(@NonNull SessionStopResult sessionStopResult) {
-                if (!sessionStopResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(sessionStopResult.getStatus()));
-                } else {
-                    subscriber.onSuccess(sessionStopResult.getSessions());
-                }
-            }
-        });
+        setupFitnessPendingResult(
+                Fitness.SessionsApi.stopSession(apiClient, identifier),
+                SingleResultCallBack.get(subscriber, SessionStopResult::getSessions)
+        );
     }
 }

@@ -34,6 +34,7 @@ import rx.Subscriber;
 import rx.observers.TestSubscriber;
 
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 
 public abstract class BaseOnSubscribeTest extends BaseTest {
 
@@ -61,6 +62,8 @@ public abstract class BaseOnSubscribeTest extends BaseTest {
         Whitebox.setInternalState(Fitness.class, recordingApi);
         Whitebox.setInternalState(Fitness.class, sensorsApi);
         Whitebox.setInternalState(Fitness.class, sessionsApi);
+
+        doReturn(status).when(status).getStatus();
 
         super.setup();
     }

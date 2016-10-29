@@ -34,6 +34,9 @@ class SessionUnregisterSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        setupFitnessPendingResult(Fitness.SessionsApi.unregisterForSessions(apiClient, pendingIntent), new StatusResultCallBack(subscriber));
+        setupFitnessPendingResult(
+                Fitness.SessionsApi.unregisterForSessions(apiClient, pendingIntent),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }

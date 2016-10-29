@@ -3,6 +3,7 @@ package com.patloew.rxfitsample;
 import android.util.Log;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
@@ -60,53 +61,58 @@ public class MainPresenter {
         fitnessSessionDataList.clear();
         view.showLoading();
 
-        DataReadRequest.Builder dataReadRequestBuilder = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                .bucketBySession(1, TimeUnit.MINUTES)
-                // 3 months back
-                .setTimeRange(System.currentTimeMillis() - 7776000000L, System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-
+        DataReadRequest.Builder dataReadRequestBuilder = getDataReadRequestBuilder();
         DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
         DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
 
         // First, request all data from the server. If there is an error (e.g. timeout),
         // switch to normal request
         subscription.add(
-                rxFit.history().read(dataReadRequestServer)
-                .doOnError(throwable -> { if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) Log.e("MainActivity", "Timeout on server query request"); })
-                .compose(RxFitOnExceptionResumeNext.with(rxFit.history().read(dataReadRequest)))
-                .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
+                rxFit.history().readBuckets(dataReadRequestServer)
+                .doOnError(throwable -> { if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) Log.e("MainActivity", "Timeout on server query request", throwable); })
+                .compose(RxFitOnExceptionResumeNext.with(rxFit.history().readBuckets(dataReadRequest)))
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(bucket -> {
-                    FitnessSessionData fitnessSessionData = new FitnessSessionData();
-                    fitnessSessionData.name = bucket.getSession().getName();
-                    fitnessSessionData.appName = bucket.getSession().getAppPackageName();
-                    fitnessSessionData.activity = bucket.getSession().getActivity();
-                    fitnessSessionData.start = new Date(bucket.getSession().getStartTime(TimeUnit.MILLISECONDS));
-                    fitnessSessionData.end = new Date(bucket.getSession().getEndTime(TimeUnit.MILLISECONDS));
-
-                    if(bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA).getDataPoints().isEmpty()) {
-                        fitnessSessionData.steps = 0;
-                    } else {
-                        fitnessSessionData.steps = bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA).getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
-                    }
-
-                    if(bucket.getDataSet(DataType.AGGREGATE_CALORIES_EXPENDED).getDataPoints().isEmpty()) {
-                        fitnessSessionData.calories = 0;
-                    } else {
-                        fitnessSessionData.calories = (int) bucket.getDataSet(DataType.AGGREGATE_CALORIES_EXPENDED).getDataPoints().get(0).getValue(Field.FIELD_CALORIES).asFloat();
-                    }
-
-                    fitnessSessionDataList.add(fitnessSessionData);
-
-                }, e -> {
-                    Log.e("MainPresenter", "Error reading fitness data", e);
-                    view.showRetrySnackbar();
-
-                }, () -> view.onFitnessSessionDataLoaded(fitnessSessionDataList))
+                .subscribe(this::onBucketLoaded, this::onBucketLoadError, () -> view.onFitnessSessionDataLoaded(fitnessSessionDataList))
         );
+    }
+
+    private static DataReadRequest.Builder getDataReadRequestBuilder() {
+        return new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                .bucketBySession(1, TimeUnit.MINUTES)
+                // 2 weeks back
+                .setTimeRange(System.currentTimeMillis() - 1209600000L, System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    private void onBucketLoadError(Throwable throwable) {
+        Log.e("MainPresenter", "Error reading fitness data", throwable);
+        view.showRetrySnackbar();
+    }
+
+    private void onBucketLoaded(Bucket bucket) {
+        FitnessSessionData fitnessSessionData = new FitnessSessionData();
+        fitnessSessionData.name = bucket.getSession().getName();
+        fitnessSessionData.appName = bucket.getSession().getAppPackageName();
+        fitnessSessionData.activity = bucket.getSession().getActivity();
+        fitnessSessionData.start = new Date(bucket.getSession().getStartTime(TimeUnit.MILLISECONDS));
+        fitnessSessionData.end = new Date(bucket.getSession().getEndTime(TimeUnit.MILLISECONDS));
+
+        if(bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA).getDataPoints().isEmpty()) {
+            fitnessSessionData.steps = 0;
+        } else {
+            fitnessSessionData.steps = bucket.getDataSet(DataType.AGGREGATE_STEP_COUNT_DELTA).getDataPoints().get(0).getValue(Field.FIELD_STEPS).asInt();
+        }
+
+        if(bucket.getDataSet(DataType.AGGREGATE_CALORIES_EXPENDED).getDataPoints().isEmpty()) {
+            fitnessSessionData.calories = 0;
+        } else {
+            fitnessSessionData.calories = (int) bucket.getDataSet(DataType.AGGREGATE_CALORIES_EXPENDED).getDataPoints().get(0).getValue(Field.FIELD_CALORIES).asFloat();
+        }
+
+        fitnessSessionDataList.add(fitnessSessionData);
+
     }
 
 

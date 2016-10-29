@@ -1,13 +1,9 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.BleDevice;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.result.BleDevicesResult;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -38,19 +34,15 @@ class BleListClaimedDevicesSingle extends BaseSingle<List<BleDevice>> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<BleDevice>> subscriber) {
-        setupFitnessPendingResult(Fitness.BleApi.listClaimedBleDevices(apiClient), new ResultCallback<BleDevicesResult>() {
-            @Override
-            public void onResult(@NonNull BleDevicesResult bleDevicesResult) {
-                if (!bleDevicesResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(bleDevicesResult.getStatus()));
-                } else {
+        setupFitnessPendingResult(
+                Fitness.BleApi.listClaimedBleDevices(apiClient),
+                SingleResultCallBack.get(subscriber, bleDevicesResult -> {
                     if(dataType == null) {
-                        subscriber.onSuccess(bleDevicesResult.getClaimedBleDevices());
+                        return bleDevicesResult.getClaimedBleDevices();
                     } else {
-                        subscriber.onSuccess(bleDevicesResult.getClaimedBleDevices(dataType));
+                        return bleDevicesResult.getClaimedBleDevices(dataType);
                     }
-                }
-            }
-        });
+                })
+        );
     }
 }

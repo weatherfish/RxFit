@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
 /* Copyright (C) 2015 Michał Charmas (http://blog.charmas.pl)
@@ -65,16 +64,13 @@ abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> 
             subscriber.onError(ex);
         }
 
-        subscriber.add(Subscriptions.create(new Action0() {
-            @Override
-            public void call() {
-                if (apiClient.isConnected() || apiClient.isConnecting()) {
-                    onUnsubscribed(apiClient);
-                    apiClient.disconnect();
-                }
-
-                subscriptionInfoMap.remove(apiClient);
+        subscriber.add(Subscriptions.create(() -> {
+            if (apiClient.isConnected() || apiClient.isConnecting()) {
+                onUnsubscribed(apiClient);
+                apiClient.disconnect();
             }
+
+            subscriptionInfoMap.remove(apiClient);
         }));
     }
 

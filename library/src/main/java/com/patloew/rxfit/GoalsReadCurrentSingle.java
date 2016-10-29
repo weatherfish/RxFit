@@ -1,9 +1,6 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Goal;
 import com.google.android.gms.fitness.request.GoalsReadRequest;
@@ -38,15 +35,9 @@ class GoalsReadCurrentSingle extends BaseSingle<List<Goal>> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<Goal>> subscriber) {
-        setupFitnessPendingResult(Fitness.GoalsApi.readCurrentGoals(apiClient, goalsReadRequest), new ResultCallback<GoalsResult>() {
-            @Override
-            public void onResult(@NonNull GoalsResult goalsResult) {
-                if (!goalsResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(goalsResult.getStatus()));
-                } else {
-                    subscriber.onSuccess(goalsResult.getGoals());
-                }
-            }
-        });
+        setupFitnessPendingResult(
+                Fitness.GoalsApi.readCurrentGoals(apiClient, goalsReadRequest),
+                SingleResultCallBack.get(subscriber, GoalsResult::getGoals)
+        );
     }
 }

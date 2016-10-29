@@ -9,12 +9,10 @@ import com.google.android.gms.fitness.request.SessionInsertRequest;
 import com.google.android.gms.fitness.request.SessionReadRequest;
 import com.google.android.gms.fitness.result.SessionReadResult;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func1;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -118,12 +116,8 @@ public class Sessions {
     }
 
     private Observable<Session> stopInternal(String identifier, Long timeout, TimeUnit timeUnit) {
-        return Single.create(new SessionStopSingle(rxFit, identifier, timeout, timeUnit)).flatMapObservable(new Func1<List<Session>, Observable<? extends Session>>() {
-            @Override
-            public Observable<? extends Session> call(List<Session> sessions) {
-                return Observable.from(sessions);
-            }
-        });
+        return Single.create(new SessionStopSingle(rxFit, identifier, timeout, timeUnit))
+                .flatMapObservable(Observable::from);
     }
 
 

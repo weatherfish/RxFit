@@ -5,12 +5,10 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.fitness.data.Goal;
 import com.google.android.gms.fitness.request.GoalsReadRequest;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func1;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -46,12 +44,7 @@ public class Goals {
 
     private Observable<Goal> readCurrentInternal(GoalsReadRequest goalsReadRequest, Long timeout, TimeUnit timeUnit) {
         return Single.create(new GoalsReadCurrentSingle(rxFit, goalsReadRequest, timeout, timeUnit))
-                .flatMapObservable(new Func1<List<Goal>, Observable<? extends Goal>>() {
-                    @Override
-                    public Observable<? extends Goal> call(List<Goal> goals) {
-                        return Observable.from(goals);
-                    }
-                });
+                .flatMapObservable(Observable::from);
     }
 
 }

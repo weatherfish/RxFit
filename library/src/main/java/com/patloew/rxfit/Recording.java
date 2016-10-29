@@ -7,12 +7,10 @@ import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Subscription;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func1;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -54,12 +52,8 @@ public class Recording {
     }
 
     private Observable<Subscription> listSubscriptionsInternal(DataType dataType, Long timeout, TimeUnit timeUnit) {
-        return Single.create(new RecordingListSubscriptionsSingle(rxFit, dataType, timeout, timeUnit)).flatMapObservable(new Func1<List<Subscription>, Observable<? extends Subscription>>() {
-                    @Override
-                    public Observable<? extends Subscription> call(List<Subscription> subscriptions) {
-                        return Observable.from(subscriptions);
-                    }
-                });
+        return Single.create(new RecordingListSubscriptionsSingle(rxFit, dataType, timeout, timeUnit))
+                .flatMapObservable(Observable::from);
     }
 
     // subscribe

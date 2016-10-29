@@ -36,7 +36,7 @@ class BleUnclaimDeviceSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        ResultCallback<Status> resultCallback = new StatusResultCallBack(subscriber);
+        ResultCallback<Status> resultCallback = SingleResultCallBack.get(subscriber);
 
         if(bleDevice != null) {
             setupFitnessPendingResult(Fitness.BleApi.unclaimBleDevice(apiClient, bleDevice), resultCallback);

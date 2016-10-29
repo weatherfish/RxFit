@@ -1,11 +1,8 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.BleDevice;
 import com.google.android.gms.fitness.data.DataType;
@@ -47,29 +44,18 @@ class BleScanObservable extends BaseObservable<BleDevice> {
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final Subscriber<? super BleDevice> subscriber) {
         bleScanCallback = new BleScanCallback() {
-            @Override
-            public void onDeviceFound(BleDevice bleDevice) {
-                subscriber.onNext(bleDevice);
-            }
-
-            @Override
-            public void onScanStopped() {
-                subscriber.onCompleted();
-            }
+            @Override public void onDeviceFound(BleDevice bleDevice) { subscriber.onNext(bleDevice); }
+            @Override public void onScanStopped() { subscriber.onCompleted(); }
         };
 
         StartBleScanRequest.Builder startBleScanRequest = new StartBleScanRequest.Builder().setBleScanCallback(bleScanCallback);
         if(dataTypes != null) { startBleScanRequest.setDataTypes(dataTypes); }
         if(stopTimeSecs != null) { startBleScanRequest.setTimeoutSecs(stopTimeSecs); }
 
-        setupFitnessPendingResult(Fitness.BleApi.startBleScan(apiClient, startBleScanRequest.build()), new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
-                if(!status.isSuccess()) {
-                    subscriber.onError(new StatusException(status));
-                }
-            }
-        });
+        setupFitnessPendingResult(
+                Fitness.BleApi.startBleScan(apiClient, startBleScanRequest.build()),
+                new StatusErrorResultCallBack(subscriber)
+        );
     }
 
     @Override

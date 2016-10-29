@@ -37,7 +37,7 @@ class RecordingSubscribeSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        ResultCallback<Status> resultCallback = new StatusResultCallBack(subscriber);
+        ResultCallback<Status> resultCallback = SingleResultCallBack.get(subscriber);
 
         if(dataSource != null) {
             setupFitnessPendingResult(Fitness.RecordingApi.subscribe(apiClient, dataSource), resultCallback);

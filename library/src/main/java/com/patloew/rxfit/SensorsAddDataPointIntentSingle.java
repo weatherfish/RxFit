@@ -37,6 +37,9 @@ class SensorsAddDataPointIntentSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        setupFitnessPendingResult(Fitness.SensorsApi.add(apiClient, sensorRequest, pendingIntent), new StatusResultCallBack(subscriber));
+        setupFitnessPendingResult(
+                Fitness.SensorsApi.add(apiClient, sensorRequest, pendingIntent),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }
