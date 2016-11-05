@@ -23,10 +23,10 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class BleClaimDeviceSingle extends BaseSingle<Status> {
+class BleClaimDeviceSingle extends BaseSingle<Status> {
 
-    private final BleDevice bleDevice;
-    private final String deviceAddress;
+    final BleDevice bleDevice;
+    final String deviceAddress;
 
     BleClaimDeviceSingle(RxFit rxFit, BleDevice bleDevice, String deviceAddress, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -36,7 +36,8 @@ public class BleClaimDeviceSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        ResultCallback<Status> resultCallback = new StatusResultCallBack(subscriber);
+        ResultCallback<Status> resultCallback = SingleResultCallBack.get(subscriber);
+
         if(bleDevice != null) {
             setupFitnessPendingResult(Fitness.BleApi.claimBleDevice(apiClient, bleDevice), resultCallback);
         } else {

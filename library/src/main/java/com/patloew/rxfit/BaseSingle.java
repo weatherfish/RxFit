@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Single;
 import rx.SingleSubscriber;
-import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
 /* Copyright (C) 2015 Michał Charmas (http://blog.charmas.pl)
@@ -39,10 +38,10 @@ import rx.subscriptions.Subscriptions;
  * FILE MODIFIED by Patrick Löwenstein, 2016
  *
  */
-public abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> {
+abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscribe<T> {
     private final boolean handleResolution;
 
-    private final Map<GoogleApiClient, SingleSubscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();
+    final Map<GoogleApiClient, SingleSubscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();
 
     protected BaseSingle(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -65,16 +64,13 @@ public abstract class BaseSingle<T> extends BaseRx<T> implements Single.OnSubscr
             subscriber.onError(ex);
         }
 
-        subscriber.add(Subscriptions.create(new Action0() {
-            @Override
-            public void call() {
-                if (apiClient.isConnected() || apiClient.isConnecting()) {
-                    onUnsubscribed(apiClient);
-                    apiClient.disconnect();
-                }
-
-                subscriptionInfoMap.remove(apiClient);
+        subscriber.add(Subscriptions.create(() -> {
+            if (apiClient.isConnected() || apiClient.isConnecting()) {
+                onUnsubscribed(apiClient);
+                apiClient.disconnect();
             }
+
+            subscriptionInfoMap.remove(apiClient);
         }));
     }
 

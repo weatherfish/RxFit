@@ -34,26 +34,26 @@ import java.util.concurrent.TimeUnit;
  * FILE MODIFIED by Patrick Löwenstein, 2016
  *
  */
-public abstract class BaseRx<T> {
+abstract class BaseRx<T> {
     protected static final Set<BaseRx> observableSet = new HashSet<>();
 
     protected final Context ctx;
     private final Api<? extends Api.ApiOptions.NotRequiredOptions>[] services;
     private final Scope[] scopes;
-    private final Long timeoutTime;
-    private final TimeUnit timeoutUnit;
+    final Long timeoutTime;
+    final TimeUnit timeoutUnit;
 
     protected BaseRx(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
-        this.ctx = rxFit.getContext();
-        this.services = rxFit.getApis();
-        this.scopes = rxFit.getScopes();
+        this.ctx = rxFit.ctx;
+        this.services = rxFit.apis;
+        this.scopes = rxFit.scopes;
 
         if(timeout != null && timeUnit != null) {
             this.timeoutTime = timeout;
             this.timeoutUnit = timeUnit;
         } else {
-            this.timeoutTime = RxFit.getDefaultTimeout();
-            this.timeoutUnit = RxFit.getDefaultTimeoutUnit();
+            this.timeoutTime = rxFit.timeoutTime;
+            this.timeoutUnit = rxFit.timeoutUnit;
         }
     }
 
@@ -73,9 +73,13 @@ public abstract class BaseRx<T> {
         }
     }
 
-    protected final GoogleApiClient createApiClient(ApiClientConnectionCallbacks apiClientConnectionCallbacks) {
+    protected GoogleApiClient.Builder getApiClientBuilder() {
+        return new GoogleApiClient.Builder(ctx);
+    }
 
-        GoogleApiClient.Builder apiClientBuilder = new GoogleApiClient.Builder(ctx);
+    protected GoogleApiClient createApiClient(ApiClientConnectionCallbacks apiClientConnectionCallbacks) {
+
+        GoogleApiClient.Builder apiClientBuilder = getApiClientBuilder();
 
 
         for (Api<? extends Api.ApiOptions.NotRequiredOptions> service : services) {

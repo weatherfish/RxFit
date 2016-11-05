@@ -24,10 +24,10 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class SensorsAddDataPointIntentSingle extends BaseSingle<Status> {
+class SensorsAddDataPointIntentSingle extends BaseSingle<Status> {
 
-    private final SensorRequest sensorRequest;
-    private final PendingIntent pendingIntent;
+    final SensorRequest sensorRequest;
+    final PendingIntent pendingIntent;
 
     SensorsAddDataPointIntentSingle(RxFit rxFit, SensorRequest sensorRequest, PendingIntent pendingIntent, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -37,6 +37,9 @@ public class SensorsAddDataPointIntentSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        setupFitnessPendingResult(Fitness.SensorsApi.add(apiClient, sensorRequest, pendingIntent), new StatusResultCallBack(subscriber));
+        setupFitnessPendingResult(
+                Fitness.SensorsApi.add(apiClient, sensorRequest, pendingIntent),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }

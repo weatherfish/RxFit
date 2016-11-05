@@ -22,9 +22,9 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class HistoryInsertDataSingle extends BaseSingle<Status> {
+class HistoryInsertDataSingle extends BaseSingle<Status> {
 
-    private final DataSet dataSet;
+    final DataSet dataSet;
 
     HistoryInsertDataSingle(RxFit rxFit, DataSet dataSet, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -33,6 +33,9 @@ public class HistoryInsertDataSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        setupFitnessPendingResult(Fitness.HistoryApi.insertData(apiClient, dataSet), new StatusResultCallBack(subscriber));
+        setupFitnessPendingResult(
+                Fitness.HistoryApi.insertData(apiClient, dataSet),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }

@@ -1,7 +1,5 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
@@ -27,9 +25,9 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class RecordingListSubscriptionsSingle extends BaseSingle<List<Subscription>> {
+class RecordingListSubscriptionsSingle extends BaseSingle<List<Subscription>> {
 
-    private final DataType dataType;
+    final DataType dataType;
 
     RecordingListSubscriptionsSingle(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -38,16 +36,7 @@ public class RecordingListSubscriptionsSingle extends BaseSingle<List<Subscripti
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<Subscription>> subscriber) {
-        ResultCallback<ListSubscriptionsResult> resultCallback = new ResultCallback<ListSubscriptionsResult>() {
-            @Override
-            public void onResult(@NonNull ListSubscriptionsResult listSubscriptionsResult) {
-                if(!listSubscriptionsResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(listSubscriptionsResult.getStatus()));
-                } else {
-                    subscriber.onSuccess(listSubscriptionsResult.getSubscriptions());
-                }
-            }
-        };
+        ResultCallback<ListSubscriptionsResult> resultCallback = SingleResultCallBack.get(subscriber, ListSubscriptionsResult::getSubscriptions);
 
         if(dataType == null) {
             setupFitnessPendingResult(Fitness.RecordingApi.listSubscriptions(apiClient), resultCallback);

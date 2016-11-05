@@ -22,9 +22,9 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class SessionInsertSingle extends BaseSingle<Status> {
+class SessionInsertSingle extends BaseSingle<Status> {
 
-    private final SessionInsertRequest sessionInsertRequest;
+    final SessionInsertRequest sessionInsertRequest;
 
     SessionInsertSingle(RxFit rxFit, SessionInsertRequest sessionInsertRequest, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -33,6 +33,9 @@ public class SessionInsertSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        setupFitnessPendingResult(Fitness.SessionsApi.insertSession(apiClient, sessionInsertRequest), new StatusResultCallBack(subscriber));
+        setupFitnessPendingResult(
+                Fitness.SessionsApi.insertSession(apiClient, sessionInsertRequest),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }

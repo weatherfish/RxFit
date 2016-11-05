@@ -1,13 +1,9 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.BleDevice;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.result.BleDevicesResult;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,9 +23,9 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class BleListClaimedDevicesSingle extends BaseSingle<List<BleDevice>> {
+class BleListClaimedDevicesSingle extends BaseSingle<List<BleDevice>> {
 
-    private final DataType dataType;
+    final DataType dataType;
 
     BleListClaimedDevicesSingle(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -38,19 +34,15 @@ public class BleListClaimedDevicesSingle extends BaseSingle<List<BleDevice>> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<BleDevice>> subscriber) {
-        setupFitnessPendingResult(Fitness.BleApi.listClaimedBleDevices(apiClient), new ResultCallback<BleDevicesResult>() {
-            @Override
-            public void onResult(@NonNull BleDevicesResult bleDevicesResult) {
-                if (!bleDevicesResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(bleDevicesResult.getStatus()));
-                } else {
+        setupFitnessPendingResult(
+                Fitness.BleApi.listClaimedBleDevices(apiClient),
+                SingleResultCallBack.get(subscriber, bleDevicesResult -> {
                     if(dataType == null) {
-                        subscriber.onSuccess(bleDevicesResult.getClaimedBleDevices());
+                        return bleDevicesResult.getClaimedBleDevices();
                     } else {
-                        subscriber.onSuccess(bleDevicesResult.getClaimedBleDevices(dataType));
+                        return bleDevicesResult.getClaimedBleDevices(dataType);
                     }
-                }
-            }
-        });
+                })
+        );
     }
 }

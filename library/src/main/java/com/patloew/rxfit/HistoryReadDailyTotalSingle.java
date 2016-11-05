@@ -1,9 +1,6 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -26,9 +23,9 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class HistoryReadDailyTotalSingle extends BaseSingle<DataSet> {
+class HistoryReadDailyTotalSingle extends BaseSingle<DataSet> {
 
-    private final DataType dataType;
+    final DataType dataType;
 
     HistoryReadDailyTotalSingle(RxFit rxFit, DataType dataType, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -37,15 +34,9 @@ public class HistoryReadDailyTotalSingle extends BaseSingle<DataSet> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super DataSet> subscriber) {
-        setupFitnessPendingResult(Fitness.HistoryApi.readDailyTotal(apiClient, dataType), new ResultCallback<DailyTotalResult>() {
-            @Override
-            public void onResult(@NonNull DailyTotalResult dailyTotalResult) {
-                if (!dailyTotalResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(dailyTotalResult.getStatus()));
-                } else {
-                    subscriber.onSuccess(dailyTotalResult.getTotal());
-                }
-            }
-        });
+        setupFitnessPendingResult(
+                Fitness.HistoryApi.readDailyTotal(apiClient, dataType),
+                SingleResultCallBack.get(subscriber, DailyTotalResult::getTotal)
+        );
     }
 }

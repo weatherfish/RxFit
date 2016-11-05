@@ -3,11 +3,8 @@ package com.patloew.rxfit;
 import android.app.PendingIntent;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.request.DataUpdateListenerRegistrationRequest;
-import com.google.android.gms.fitness.request.DataUpdateListenerUnregistrationRequest;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,9 +23,9 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class HistoryUnregisterDataUpdateListenerSingle extends BaseSingle<Status> {
+class HistoryUnregisterDataUpdateListenerSingle extends BaseSingle<Status> {
 
-    private final PendingIntent pendingIntent;
+    final PendingIntent pendingIntent;
 
     HistoryUnregisterDataUpdateListenerSingle(RxFit rxFit, PendingIntent pendingIntent, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -37,8 +34,9 @@ public class HistoryUnregisterDataUpdateListenerSingle extends BaseSingle<Status
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
-        ResultCallback<Status> resultCallback = new StatusResultCallBack(subscriber);
-
-        setupFitnessPendingResult(Fitness.HistoryApi.unregisterDataUpdateListener(apiClient, pendingIntent), resultCallback);
+        setupFitnessPendingResult(
+                Fitness.HistoryApi.unregisterDataUpdateListener(apiClient, pendingIntent),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }

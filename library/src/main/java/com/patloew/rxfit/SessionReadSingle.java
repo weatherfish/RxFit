@@ -1,9 +1,6 @@
 package com.patloew.rxfit;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.request.SessionReadRequest;
 import com.google.android.gms.fitness.result.SessionReadResult;
@@ -25,9 +22,9 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class SessionReadSingle extends BaseSingle<SessionReadResult> {
+class SessionReadSingle extends BaseSingle<SessionReadResult> {
 
-    private final SessionReadRequest sessionReadRequest;
+    final SessionReadRequest sessionReadRequest;
 
     SessionReadSingle(RxFit rxFit, SessionReadRequest sessionReadRequest, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -36,15 +33,9 @@ public class SessionReadSingle extends BaseSingle<SessionReadResult> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super SessionReadResult> subscriber) {
-        setupFitnessPendingResult(Fitness.SessionsApi.readSession(apiClient, sessionReadRequest), new ResultCallback<SessionReadResult>() {
-            @Override
-            public void onResult(@NonNull SessionReadResult sessionReadResult) {
-                if (!sessionReadResult.getStatus().isSuccess()) {
-                    subscriber.onError(new StatusException(sessionReadResult.getStatus()));
-                } else {
-                    subscriber.onSuccess(sessionReadResult);
-                }
-            }
-        });
+        setupFitnessPendingResult(
+                Fitness.SessionsApi.readSession(apiClient, sessionReadRequest),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }

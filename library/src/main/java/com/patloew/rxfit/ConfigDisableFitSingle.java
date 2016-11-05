@@ -21,7 +21,7 @@ import rx.SingleSubscriber;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class ConfigDisableFitSingle extends BaseSingle<Status> {
+class ConfigDisableFitSingle extends BaseSingle<Status> {
 
     ConfigDisableFitSingle(RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -29,6 +29,9 @@ public class ConfigDisableFitSingle extends BaseSingle<Status> {
 
     @Override
     protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Status> subscriber) {
-        setupFitnessPendingResult(Fitness.ConfigApi.disableFit(apiClient), new StatusResultCallBack(subscriber));
+        setupFitnessPendingResult(
+                Fitness.ConfigApi.disableFit(apiClient),
+                SingleResultCallBack.get(subscriber)
+        );
     }
 }
