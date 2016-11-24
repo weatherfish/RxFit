@@ -36,6 +36,8 @@ An `RxFitOnExceptionResumeNext` Transformer is available in the lib, which resum
 
 An optional global default timeout for all Fit API requests made through the library can be set via `rxFit.setDefaultTimeout(...)`. In addition, timeouts can be set when creating a new Observable by providing timeout parameters, e.g. `rxFit.history().read(dataReadRequest, 15, TimeUnit.SECONDS)`. These parameters override the default timeout. When a timeout occurs, a StatusException is provided via `onError()`. The RxJava timeout operators can be used instead, but these do not cancel the Fit API request immediately.
 
+If you don't want the library to automatically handle resolutions (e.g. for usage in a background service), you can disable this behavior when creating an RxFit instance by passing in `false` to the `handleResolutions` parameter: `new RxFit(ctx, apiArray, scopeArray, false)`.
+
 You can also obtain a `Single<GoogleApiClient>`, which connects on subscribe and disconnects on unsubscribe via `GoogleAPIClientSingle.create(...)`.
 
 The following Exceptions are thrown in the lib and provided via `onError()`:
@@ -54,7 +56,7 @@ A basic sample app is available in the `sample` project. You need to create an O
 The lib is available on jCenter. Add the following to your `build.gradle`:
 
 	dependencies {
-	    compile 'com.patloew.rxfit:rxfit2:2.0.0'
+	    compile 'com.patloew.rxfit:rxfit2:2.0.1'
 	}
 
 # Testing
