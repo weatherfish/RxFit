@@ -4,6 +4,8 @@
 
 This library wraps the Fit API in [RxJava 2](https://github.com/ReactiveX/RxJava/tree/2.x) Observables and Singles. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
 
+See the [1.x branch](https://github.com/patloew/RxFit/tree/1.x) for a RxJava 1 version of this library.
+
 # Usage
 
 Create an RxFit instance once, preferably in your Application's `onCreate()` or by using a dependency injection framework. Make sure to include all the APIs and Scopes that you need for your app. The RxFit class is very similar to the Fitness class provided by the Fit API. Instead of `Fitness.HistoryApi.readData(apiClient, dataReadRequest)` you can use `rxFit.history().read(dataReadRequest)`. Make sure to have the Location and Body Sensors permission from Marshmallow on, if they are needed by your Fit API requests. If the user didn’t already authorize your app for using fitness data, the lib handles showing the authorization dialog.
