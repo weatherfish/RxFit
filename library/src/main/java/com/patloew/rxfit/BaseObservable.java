@@ -38,18 +38,15 @@ import io.reactivex.ObservableOnSubscribe;
  *
  */
 abstract class BaseObservable<T> extends BaseRx<T> implements ObservableOnSubscribe<T> {
-    private final boolean handleResolution;
 
     private final Map<GoogleApiClient, ObservableEmitter<T>> subscriptionInfoMap = new ConcurrentHashMap<>();
 
     protected BaseObservable(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
-        handleResolution = true;
     }
 
     protected BaseObservable(@NonNull Context ctx, @NonNull Api<? extends Api.ApiOptions.NotRequiredOptions>[] services, Scope[] scopes) {
         super(ctx, services, scopes);
-        handleResolution = false;
     }
 
     @Override

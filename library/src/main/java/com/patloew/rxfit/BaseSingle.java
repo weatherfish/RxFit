@@ -38,18 +38,15 @@ import io.reactivex.SingleOnSubscribe;
  *
  */
 abstract class BaseSingle<T> extends BaseRx<T> implements SingleOnSubscribe<T> {
-    private final boolean handleResolution;
 
     final Map<GoogleApiClient, SingleEmitter<T>> subscriptionInfoMap = new ConcurrentHashMap<>();
 
     protected BaseSingle(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
-        handleResolution = true;
     }
 
     protected BaseSingle(@NonNull Context ctx, @NonNull Api<? extends Api.ApiOptions.NotRequiredOptions>[] services, Scope[] scopes) {
         super(ctx, services, scopes);
-        handleResolution = false;
     }
 
     @Override

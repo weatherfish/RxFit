@@ -40,6 +40,7 @@ abstract class BaseRx<T> {
     protected final Context ctx;
     private final Api<? extends Api.ApiOptions.NotRequiredOptions>[] services;
     private final Scope[] scopes;
+    protected final boolean handleResolution;
     final Long timeoutTime;
     final TimeUnit timeoutUnit;
 
@@ -47,6 +48,7 @@ abstract class BaseRx<T> {
         this.ctx = rxFit.ctx;
         this.services = rxFit.apis;
         this.scopes = rxFit.scopes;
+        this.handleResolution = rxFit.handleResolutions;
 
         if(timeout != null && timeUnit != null) {
             this.timeoutTime = timeout;
@@ -61,6 +63,7 @@ abstract class BaseRx<T> {
         this.ctx = ctx;
         this.services = services;
         this.scopes = scopes;
+        this.handleResolution = false;
         timeoutTime = null;
         timeoutUnit = null;
     }

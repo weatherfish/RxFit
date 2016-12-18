@@ -39,6 +39,7 @@ public class RxFit {
     final Context ctx;
     final Api<? extends Api.ApiOptions.NotRequiredOptions>[] apis;
     final Scope[] scopes;
+    final boolean handleResolutions;
 
     private final Ble ble = new Ble(this);
     private final Config config = new Config(this);
@@ -49,7 +50,7 @@ public class RxFit {
     private final Sessions sessions = new Sessions(this);
 
 
-    /* Creates a new RxFit instance.
+    /* Creates a new RxFit instance, which handles resolutions.
      *
      * @param ctx Context.
      * @param apis An array of Fitness APIs to be used in your app.
@@ -59,6 +60,23 @@ public class RxFit {
         this.ctx = ctx.getApplicationContext();
         this.apis = apis;
         this.scopes = scopes;
+        this.handleResolutions = true;
+    }
+
+    /* Creates a new RxFit instance.
+     *
+     * @param ctx Context.
+     * @param apis An array of Fitness APIs to be used in your app.
+     * @param scopes An array of the Scopes to be requested for your app.
+     * @param handleResolutions Set whether the library should try to handle resolutions
+     *                          (by showing the resolution dialog) or not. Setting this
+     *                          to false can be useful for background services.
+     */
+    public RxFit(@NonNull Context ctx, @NonNull Api<? extends Api.ApiOptions.NotRequiredOptions>[] apis, @NonNull Scope[] scopes, boolean handleResolutions) {
+        this.ctx = ctx.getApplicationContext();
+        this.apis = apis;
+        this.scopes = scopes;
+        this.handleResolutions = handleResolutions;
     }
 
     /* Set a default timeout for all requests to the Fit API made in the lib.

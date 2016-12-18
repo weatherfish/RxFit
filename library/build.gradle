@@ -5,7 +5,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.patloew.rxfit'
-version = '2.0.0'
+version = '2.0.1'
 project.archivesBaseName = 'rxfit2'
 
 android {
@@ -16,12 +16,13 @@ android {
         minSdkVersion 9
         targetSdkVersion 25
         versionCode 1
-        versionName "2.0.0"
+        versionName "2.0.1"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-rules-consumer.pro'
         }
     }
     compileOptions {
@@ -42,8 +43,8 @@ retrolambda {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'io.reactivex.rxjava2:rxjava:2.0.0'
-    compile 'com.google.android.gms:play-services-fitness:9.8.0'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.1'
+    compile 'com.google.android.gms:play-services-fitness:10.0.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
