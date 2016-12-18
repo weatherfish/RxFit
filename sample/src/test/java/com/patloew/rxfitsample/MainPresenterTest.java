@@ -17,7 +17,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;

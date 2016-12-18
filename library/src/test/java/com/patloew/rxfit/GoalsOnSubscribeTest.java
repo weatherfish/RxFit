@@ -23,8 +23,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Single;
-import rx.observers.TestSubscriber;
+import io.reactivex.Single;
 
 import static org.mockito.Mockito.when;
 
@@ -47,7 +46,6 @@ public class GoalsOnSubscribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void GoalsReadCurrentSingle_Success() {
-        TestSubscriber<List<Goal>> sub = new TestSubscriber<>();
         GoalsResult goalsResult = Mockito.mock(GoalsResult.class);
 
         GoalsReadCurrentSingle single = PowerMockito.spy(new GoalsReadCurrentSingle(rxFit, goalsReadRequest, null, null));
@@ -62,14 +60,12 @@ public class GoalsOnSubscribeTest extends BaseOnSubscribeTest {
         when(goalsApi.readCurrentGoals(apiClient, goalsReadRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, goalList);
+        assertSingleValue(Single.create(single).test(), goalList);
     }
 
     @Test
     public void GoalsReadCurrentSingle_StatusException() {
-        TestSubscriber<List<Goal>> sub = new TestSubscriber<>();
         GoalsResult goalsResult = Mockito.mock(GoalsResult.class);
 
         GoalsReadCurrentSingle single = PowerMockito.spy(new GoalsReadCurrentSingle(rxFit, goalsReadRequest, null, null));
@@ -84,8 +80,7 @@ public class GoalsOnSubscribeTest extends BaseOnSubscribeTest {
         when(goalsApi.readCurrentGoals(apiClient, goalsReadRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 }

@@ -1,8 +1,12 @@
 # Reactive Fit API Library for Android
 
+<<<<<<< HEAD
 [![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=1.x)](https://travis-ci.org/patloew/RxFit) [![codecov](https://codecov.io/gh/patloew/RxFit/branch/1.x/graph/badge.svg)](https://codecov.io/gh/patloew/RxFit/branch/1.x) [ ![Download](https://api.bintray.com/packages/patloew/maven/RxFit/images/download.svg) ](https://bintray.com/patloew/maven/RxFit/_latestVersion) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RxFit-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3252) [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
+=======
+[![Build Status](https://travis-ci.org/patloew/RxFit.svg?branch=2.x)](https://travis-ci.org/patloew/RxFit) [![codecov](https://codecov.io/gh/patloew/RxFit/branch/2.x/graph/badge.svg)](https://codecov.io/gh/patloew/RxFit/branch/2.x) [ ![Download](https://api.bintray.com/packages/patloew/maven/RxFit2/images/download.svg) ](https://bintray.com/patloew/maven/RxFit2/_latestVersion) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RxFit-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3252) [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
+>>>>>>> patloew/2.x
 
-This library wraps the Fit API in [RxJava](https://github.com/ReactiveX/RxJava) Observables and Singles. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
+This library wraps the Fit API in [RxJava 2](https://github.com/ReactiveX/RxJava/tree/2.x) Observables and Singles. No more managing GoogleApiClients! Also, the authorization process for using fitness data is handled by the lib.
 
 See the [2.x branch](https://github.com/patloew/RxFit/tree/2.x) for a RxJava 2 version of this library.
 
@@ -56,8 +60,11 @@ A basic sample app is available in the `sample` project. You need to create an O
 The lib is available on jCenter. Add the following to your `build.gradle`:
 
 	dependencies {
+<<<<<<< HEAD
 	    compile 'com.patloew.rxfit:rxfit:1.5.0'
 	    // or, for a RxJava 2 version of this library:
+=======
+>>>>>>> patloew/2.x
 	    compile 'com.patloew.rxfit:rxfit2:2.0.0'
 	}
 

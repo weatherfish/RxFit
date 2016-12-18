@@ -24,13 +24,14 @@ import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import rx.Observable;
-import rx.Single;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("com.google.android.gms.fitness.Fitness")
@@ -43,6 +44,7 @@ public class HistoryTest extends BaseTest {
         MockitoAnnotations.initMocks(this);
         PowerMockito.spy(Single.class);
         PowerMockito.mockStatic(Observable.class);
+        doReturn(100).when(Observable.class, "bufferSize");
         super.setup();
     }
 
@@ -151,7 +153,7 @@ public class HistoryTest extends BaseTest {
         assertEquals(request, single.dataReadRequest);
         assertNoTimeoutSet(single);
 
-        single = captor.getAllValues().get(2);
+        single = captor.getAllValues().get(1);
         assertEquals(request, single.dataReadRequest);
         assertTimeoutSet(single);
     }
@@ -173,7 +175,7 @@ public class HistoryTest extends BaseTest {
         assertEquals(request, single.dataReadRequest);
         assertNoTimeoutSet(single);
 
-        single = captor.getAllValues().get(2);
+        single = captor.getAllValues().get(1);
         assertEquals(request, single.dataReadRequest);
         assertTimeoutSet(single);
     }

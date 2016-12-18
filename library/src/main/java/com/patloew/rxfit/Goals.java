@@ -7,8 +7,8 @@ import com.google.android.gms.fitness.request.GoalsReadRequest;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.Single;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -44,7 +44,7 @@ public class Goals {
 
     private Observable<Goal> readCurrentInternal(GoalsReadRequest goalsReadRequest, Long timeout, TimeUnit timeUnit) {
         return Single.create(new GoalsReadCurrentSingle(rxFit, goalsReadRequest, timeout, timeUnit))
-                .flatMapObservable(Observable::from);
+                .flatMapObservable(Observable::fromIterable);
     }
 
 }

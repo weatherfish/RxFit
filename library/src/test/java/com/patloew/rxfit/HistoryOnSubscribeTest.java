@@ -27,8 +27,7 @@ import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import rx.Single;
-import rx.observers.TestSubscriber;
+import io.reactivex.Single;
 
 import static org.mockito.Mockito.when;
 
@@ -52,7 +51,6 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void HistoryDeleteDataObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         DataDeleteRequest dataDeleteRequest = Mockito.mock(DataDeleteRequest.class);
         HistoryDeleteDataSingle single = PowerMockito.spy(new HistoryDeleteDataSingle(rxFit, dataDeleteRequest, null, null));
 
@@ -61,14 +59,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.deleteData(apiClient, dataDeleteRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void HistoryDeleteDataObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         DataDeleteRequest dataDeleteRequest = Mockito.mock(DataDeleteRequest.class);
         HistoryDeleteDataSingle single = PowerMockito.spy(new HistoryDeleteDataSingle(rxFit, dataDeleteRequest, null, null));
 
@@ -77,16 +73,14 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.deleteData(apiClient, dataDeleteRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // HistoryInsertDataObservable
 
     @Test
     public void HistoryInsertDataObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryInsertDataSingle single = PowerMockito.spy(new HistoryInsertDataSingle(rxFit, dataSet, null, null));
 
         setPendingResultValue(status);
@@ -94,14 +88,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.insertData(apiClient, dataSet)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void HistoryInsertDataObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryInsertDataSingle single = PowerMockito.spy(new HistoryInsertDataSingle(rxFit, dataSet, null, null));
 
         setPendingResultValue(status);
@@ -109,16 +101,14 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.insertData(apiClient, dataSet)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // HistoryReadDailyTotalObservable
 
     @Test
     public void HistoryReadDailyTotalObservable_Success() {
-        TestSubscriber<DataSet> sub = new TestSubscriber<>();
         DailyTotalResult dailyTotalResult = Mockito.mock(DailyTotalResult.class);
         HistoryReadDailyTotalSingle single = PowerMockito.spy(new HistoryReadDailyTotalSingle(rxFit, dataType, null, null));
 
@@ -129,14 +119,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.readDailyTotal(apiClient, dataType)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, dataSet);
+        assertSingleValue(Single.create(single).test(), dataSet);
     }
 
     @Test
     public void HistoryReadDailyTotalObservable_StatusException() {
-        TestSubscriber<DataSet> sub = new TestSubscriber<>();
         DailyTotalResult dailyTotalResult = Mockito.mock(DailyTotalResult.class);
         HistoryReadDailyTotalSingle single = PowerMockito.spy(new HistoryReadDailyTotalSingle(rxFit, dataType, null, null));
 
@@ -147,16 +135,14 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.readDailyTotal(apiClient, dataType)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // HistoryReadDataObservable
 
     @Test
     public void HistoryReadDataObservable_Success() {
-        TestSubscriber<DataReadResult> sub = new TestSubscriber<>();
         DataReadRequest dataReadRequest = Mockito.mock(DataReadRequest.class);
         DataReadResult dataReadResult = Mockito.mock(DataReadResult.class);
         HistoryReadDataSingle single = PowerMockito.spy(new HistoryReadDataSingle(rxFit, dataReadRequest, null, null));
@@ -167,14 +153,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.readData(apiClient, dataReadRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, dataReadResult);
+        assertSingleValue(Single.create(single).test(), dataReadResult);
     }
 
     @Test
     public void HistoryReadDataObservable_StatusException() {
-        TestSubscriber<DataReadResult> sub = new TestSubscriber<>();
         DataReadRequest dataReadRequest = Mockito.mock(DataReadRequest.class);
         DataReadResult dataReadResult = Mockito.mock(DataReadResult.class);
         HistoryReadDataSingle single = PowerMockito.spy(new HistoryReadDataSingle(rxFit, dataReadRequest, null, null));
@@ -185,16 +169,14 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.readData(apiClient, dataReadRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // HistoryUpdateDataObservable
 
     @Test
     public void HistoryUpdateDataObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         DataUpdateRequest dataUpdateRequest = Mockito.mock(DataUpdateRequest.class);
         HistoryUpdateDataSingle single = PowerMockito.spy(new HistoryUpdateDataSingle(rxFit, dataUpdateRequest, null, null));
 
@@ -203,14 +185,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.updateData(apiClient, dataUpdateRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void HistoryUpdateDataObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         DataUpdateRequest dataUpdateRequest = Mockito.mock(DataUpdateRequest.class);
         HistoryUpdateDataSingle single = PowerMockito.spy(new HistoryUpdateDataSingle(rxFit, dataUpdateRequest, null, null));
 
@@ -219,16 +199,14 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.updateData(apiClient, dataUpdateRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // HistoryRegisterDataUpdateListenerSingle
 
     @Test
     public void HistoryRegisterDataUpdateListenerSingle_DataSource_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, dataSource, null, null, null));
 
         setPendingResultValue(status);
@@ -236,14 +214,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void HistoryRegisterDataUpdateListenerSingle_DataSource_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, dataSource, null, null, null));
 
         setPendingResultValue(status);
@@ -251,14 +227,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void HistoryRegisterDataUpdateListenerSingle_DataType_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, null, dataType, null, null));
 
         setPendingResultValue(status);
@@ -266,14 +240,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void HistoryRegisterDataUpdateListenerSingle_DataType_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, null, dataType, null, null));
 
         setPendingResultValue(status);
@@ -281,14 +253,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void HistoryRegisterDataUpdateListenerSingle_DataType_DataSource_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, dataSource, dataType, null, null));
 
         setPendingResultValue(status);
@@ -296,14 +266,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void HistoryRegisterDataUpdateListenerSingle_DataType_DataSource_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryRegisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryRegisterDataUpdateListenerSingle(rxFit, pendingIntent, dataSource, dataType, null, null));
 
         setPendingResultValue(status);
@@ -311,16 +279,14 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.registerDataUpdateListener(Matchers.eq(apiClient), Matchers.any(DataUpdateListenerRegistrationRequest.class))).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // HistoryUnregisterDataUpdateListenerSingle
 
     @Test
     public void HistoryUnregisterDataUpdateListenerSingle_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryUnregisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryUnregisterDataUpdateListenerSingle(rxFit, pendingIntent, null, null));
 
         setPendingResultValue(status);
@@ -328,14 +294,12 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.unregisterDataUpdateListener(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void HistoryUnregisterDataUpdateListenerSingle_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         HistoryUnregisterDataUpdateListenerSingle single = PowerMockito.spy(new HistoryUnregisterDataUpdateListenerSingle(rxFit, pendingIntent, null, null));
 
         setPendingResultValue(status);
@@ -343,9 +307,8 @@ public class HistoryOnSubscribeTest extends BaseOnSubscribeTest {
         when(historyApi.unregisterDataUpdateListener(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
 

@@ -24,8 +24,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Single;
-import rx.observers.TestSubscriber;
+import io.reactivex.Single;
 
 import static org.mockito.Mockito.when;
 
@@ -50,7 +49,6 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void RecordingListSubscriptionsObservable_Success() {
-        TestSubscriber<List<Subscription>> sub = new TestSubscriber<>();
         RecordingListSubscriptionsSingle single = PowerMockito.spy(new RecordingListSubscriptionsSingle(rxFit, null, null, null));
 
         ListSubscriptionsResult listSubscriptionsResult = Mockito.mock(ListSubscriptionsResult.class);
@@ -66,14 +64,12 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.listSubscriptions(apiClient)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, subscriptionList);
+        assertSingleValue(Single.create(single).test(), subscriptionList);
     }
 
     @Test
     public void RecordingListSubscriptionsObservable_StatusException() {
-        TestSubscriber<List<Subscription>> sub = new TestSubscriber<>();
         RecordingListSubscriptionsSingle single = PowerMockito.spy(new RecordingListSubscriptionsSingle(rxFit, null, null, null));
 
         ListSubscriptionsResult listSubscriptionsResult = Mockito.mock(ListSubscriptionsResult.class);
@@ -89,14 +85,12 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.listSubscriptions(apiClient)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void RecordingListSubscriptionsObservable_WithDataType_Success() {
-        TestSubscriber<List<Subscription>> sub = new TestSubscriber<>();
         RecordingListSubscriptionsSingle single = PowerMockito.spy(new RecordingListSubscriptionsSingle(rxFit, dataType, null, null));
 
         ListSubscriptionsResult listSubscriptionsResult = Mockito.mock(ListSubscriptionsResult.class);
@@ -112,14 +106,12 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.listSubscriptions(apiClient, dataType)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, subscriptionList);
+        assertSingleValue(Single.create(single).test(), subscriptionList);
     }
 
     @Test
     public void RecordingListSubscriptionsObservable_WithDataType_StatusException() {
-        TestSubscriber<List<Subscription>> sub = new TestSubscriber<>();
         RecordingListSubscriptionsSingle single = PowerMockito.spy(new RecordingListSubscriptionsSingle(rxFit, dataType, null, null));
 
         ListSubscriptionsResult listSubscriptionsResult = Mockito.mock(ListSubscriptionsResult.class);
@@ -135,16 +127,14 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.listSubscriptions(apiClient, dataType)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // RecordingSubscribeObservable
 
     @Test
     public void RecordingSubscribeObservable_DataType_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingSubscribeSingle single = PowerMockito.spy(new RecordingSubscribeSingle(rxFit, null, dataType, null, null));
 
         setPendingResultValue(status);
@@ -152,15 +142,13 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.subscribe(apiClient, dataType)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
 
     @Test
     public void RecordingSubscribeObservable_DataType_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingSubscribeSingle single = PowerMockito.spy(new RecordingSubscribeSingle(rxFit, null, dataType, null, null));
 
         setPendingResultValue(status);
@@ -168,14 +156,12 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.subscribe(apiClient, dataType)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void RecordingSubscribeObservable_DataSource_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingSubscribeSingle single = PowerMockito.spy(new RecordingSubscribeSingle(rxFit, dataSource, null, null, null));
 
         setPendingResultValue(status);
@@ -183,15 +169,13 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.subscribe(apiClient, dataSource)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
 
     @Test
     public void RecordingSubscribeObservable_DataSource_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingSubscribeSingle single = PowerMockito.spy(new RecordingSubscribeSingle(rxFit, dataSource, null, null, null));
 
         setPendingResultValue(status);
@@ -199,16 +183,14 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.subscribe(apiClient, dataSource)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // RecordingSubscribeObservable
 
     @Test
     public void RecordingUnsubscribeObservable_DataType_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingUnsubscribeSingle single = PowerMockito.spy(new RecordingUnsubscribeSingle(rxFit, null, dataType, null, null, null));
 
         setPendingResultValue(status);
@@ -216,15 +198,13 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.unsubscribe(apiClient, dataType)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
 
     @Test
     public void RecordingUnsubscribeObservable_DataType_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingUnsubscribeSingle single = PowerMockito.spy(new RecordingUnsubscribeSingle(rxFit, null, dataType, null, null, null));
 
         setPendingResultValue(status);
@@ -232,14 +212,12 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.unsubscribe(apiClient, dataType)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void RecordingUnsubscribeObservable_DataSource_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingUnsubscribeSingle single = PowerMockito.spy(new RecordingUnsubscribeSingle(rxFit, dataSource, null, null, null, null));
 
         setPendingResultValue(status);
@@ -247,14 +225,12 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.unsubscribe(apiClient, dataSource)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void RecordingUnsubscribeObservable_DataSource_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingUnsubscribeSingle single = PowerMockito.spy(new RecordingUnsubscribeSingle(rxFit, dataSource, null, null, null, null));
 
         setPendingResultValue(status);
@@ -262,14 +238,12 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.unsubscribe(apiClient, dataSource)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     @Test
     public void RecordingUnsubscribeObservable_Subscription_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingUnsubscribeSingle single = PowerMockito.spy(new RecordingUnsubscribeSingle(rxFit, null, null, subscription, null, null));
 
         setPendingResultValue(status);
@@ -277,14 +251,12 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.unsubscribe(apiClient, subscription)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void RecordingUnsubscribeObservable_Subscription_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         RecordingUnsubscribeSingle single = PowerMockito.spy(new RecordingUnsubscribeSingle(rxFit, null, null, subscription, null, null));
 
         setPendingResultValue(status);
@@ -292,9 +264,8 @@ public class RecordingOnSubscribeTest extends BaseOnSubscribeTest {
         when(recordingApi.unsubscribe(apiClient, subscription)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
 }

@@ -17,18 +17,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import rx.Completable;
-import rx.Observable;
-import rx.Single;
-import rx.Subscriber;
-import rx.observers.TestSubscriber;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.Single;
+import io.reactivex.exceptions.CompositeException;
+import io.reactivex.observers.TestObserver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -78,14 +77,9 @@ public class RxFitTest extends BaseOnSubscribeTest {
 
     @Test
     public void checkConnection() {
-        final Observable<Void> observable = Observable.just(null);
-        PowerMockito.mockStatic(Observable.class, new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                return observable;
-            }
-        });
+        final Observable<Void> observable = Observable.empty();
 
+        PowerMockito.mockStatic(Observable.class, invocation -> observable);
         ArgumentCaptor<CheckConnectionObservable> captor = ArgumentCaptor.forClass(CheckConnectionObservable.class);
 
         rxFit.checkConnection();
@@ -101,47 +95,41 @@ public class RxFitTest extends BaseOnSubscribeTest {
 
     @Test
     public void GoogleAPIClientObservable_Success() {
-        TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
         GoogleAPIClientSingle single = PowerMockito.spy(new GoogleAPIClientSingle(ctx, new Api[] {}, new Scope[] {}));
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, apiClient);
+        assertSingleValue(Single.create(single).test(), apiClient);
     }
 
     @Test
     public void GoogleAPIClientObservable_ConnectionException() {
-        TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
         final GoogleAPIClientSingle single = PowerMockito.spy(new GoogleAPIClientSingle(ctx, new Api[] {}, new Scope[] {}));
 
         setupBaseSingleError(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, GoogleAPIConnectionException.class);
+        assertError(Single.create(single).test(), GoogleAPIConnectionException.class);
     }
 
     // CheckConnectionCompletable
 
     @Test
     public void CheckConnectionCompletable_Success() {
-        TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
         CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableSuccess(observable);
-        Completable.fromObservable(Observable.create(observable)).subscribe(sub);
+        TestObserver<Void> sub = Completable.fromObservable(Observable.create(observable)).test();
 
-        sub.assertCompleted();
+        sub.assertComplete();
         sub.assertNoValues();
     }
 
     @Test
     public void CheckConnectionCompletable_Error() {
-        TestSubscriber<GoogleApiClient> sub = new TestSubscriber<>();
         CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableError(observable);
-        Completable.fromObservable(Observable.create(observable)).subscribe(sub);
+        TestObserver<Void> sub = Completable.fromObservable(Observable.create(observable)).test();
 
         sub.assertError(GoogleAPIConnectionException.class);
         sub.assertNoValues();
@@ -150,58 +138,48 @@ public class RxFitTest extends BaseOnSubscribeTest {
 
     @Test
     public void CheckConnectionCompletable_Resolution_Success() {
-        TestSubscriber<GoogleApiClient> sub1 = new TestSubscriber<>();
-        TestSubscriber<GoogleApiClient> sub2 = new TestSubscriber<>();
         final GoogleApiClient apiClient2 = Mockito.mock(GoogleApiClient.class);
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         Completable completable = Completable.fromObservable(Observable.create(observable));
 
         setupBaseObservableResolution(observable, apiClient);
-        completable.subscribe(sub1);
+        TestObserver<Void> sub1 = completable.test();
 
         setupBaseObservableResolution(observable, apiClient2);
-        completable.subscribe(sub2);
+        TestObserver<Void> sub2 = completable.test();
 
-        doAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                observable.onGoogleApiClientReady(apiClient, getSubscriber(observable, apiClient));
-                return null;
-            }
+        doAnswer(invocation -> {
+            observable.onGoogleApiClientReady(apiClient, getSubscriber(observable, apiClient));
+            return null;
         }).when(apiClient).connect();
 
-        doAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                observable.onGoogleApiClientReady(apiClient2, getSubscriber(observable, apiClient2));
-                return null;
-            }
+        doAnswer(invocation -> {
+            observable.onGoogleApiClientReady(apiClient2, getSubscriber(observable, apiClient2));
+            return null;
         }).when(apiClient2).connect();
 
         BaseRx.onResolutionResult(Activity.RESULT_OK, Mockito.mock(ConnectionResult.class));
 
-        sub1.assertCompleted();
+        sub1.assertComplete();
         sub1.assertNoValues();
 
-        sub2.assertCompleted();
+        sub2.assertComplete();
         sub2.assertNoValues();
     }
 
     @Test
     public void CheckConnectionCompletable_Resolution_Error() {
-        TestSubscriber<GoogleApiClient> sub1 = new TestSubscriber<>();
-        TestSubscriber<GoogleApiClient> sub2 = new TestSubscriber<>();
         final GoogleApiClient apiClient2 = Mockito.mock(GoogleApiClient.class);
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         Completable completable = Completable.fromObservable(Observable.create(observable));
 
         setupBaseObservableResolution(observable, apiClient);
-        completable.subscribe(sub1);
+        TestObserver<Void> sub1 = completable.test();
 
         setupBaseObservableResolution(observable, apiClient2);
-        completable.subscribe(sub2);
+        TestObserver<Void> sub2 = completable.test();
 
         BaseObservable.onResolutionResult(Activity.RESULT_CANCELED, Mockito.mock(ConnectionResult.class));
 
@@ -214,60 +192,52 @@ public class RxFitTest extends BaseOnSubscribeTest {
 
     @Test
     public void CheckConnectionCompletable_Resolution_Error_ResumeNext_Resolution_Success() {
-        TestSubscriber<Void> sub = new TestSubscriber<>();
         ConnectionResult connectionResult = Mockito.mock(ConnectionResult.class);
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.<Void>just(null))))
-                .subscribe(sub);
+        TestObserver<Void> sub = Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.empty()))).test();
 
         when(connectionResult.hasResolution()).thenReturn(true);
         BaseObservable.onResolutionResult(Activity.RESULT_CANCELED, connectionResult);
 
-        sub.assertError(GoogleAPIConnectionException.class);
+        sub.assertError(throwable -> ((CompositeException)throwable).getExceptions().get(0) instanceof GoogleAPIConnectionException);
         sub.assertNoValues();
     }
 
     @Test
     public void CheckConnectionCompletable_Resolution_Error_ResumeNext_NoResolution_Success() {
-        TestSubscriber<Void> sub = new TestSubscriber<>();
         ConnectionResult connectionResult = Mockito.mock(ConnectionResult.class);
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.<Void>just(null))))
-                .subscribe(sub);
+        TestObserver<Void> sub = Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.empty()))).test();
 
         when(connectionResult.hasResolution()).thenReturn(false);
         BaseObservable.onResolutionResult(Activity.RESULT_CANCELED, connectionResult);
 
-        sub.assertCompleted();
+        sub.assertComplete();
         sub.assertNoValues();
     }
 
     @Test
     public void CheckConnectionCompletable_Resolution_Success_ResumeNext_Error() {
-        TestSubscriber<Void> sub = new TestSubscriber<>();
         ConnectionResult connectionResult = Mockito.mock(ConnectionResult.class);
         final CheckConnectionObservable observable = PowerMockito.spy(new CheckConnectionObservable(rxFit));
 
         setupBaseObservableResolution(observable, apiClient);
-        Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.<Void>just(null))))
-                .subscribe(sub);
+        TestObserver<Void> sub = Completable.fromObservable(Observable.create(observable).compose(RxFitOnExceptionResumeNext.with(Observable.empty()))).test();
 
-        doAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                observable.onGoogleApiClientReady(apiClient, getSubscriber(observable, apiClient));
-                return null;
-            }
+        doAnswer(invocation -> {
+            observable.onGoogleApiClientReady(apiClient, getSubscriber(observable, apiClient));
+            return null;
         }).when(apiClient).connect();
 
-        doThrow(new Error("Generic error")).when(observable).onGoogleApiClientReady(Matchers.any(GoogleApiClient.class), Matchers.any(Subscriber.class));
+        Error error = new Error("Generic error");
+        doThrow(error).when(observable).onGoogleApiClientReady(Matchers.any(GoogleApiClient.class), Matchers.any(ObservableEmitter.class));
         BaseObservable.onResolutionResult(Activity.RESULT_OK, connectionResult);
 
-        sub.assertError(Error.class);
+        sub.assertError(throwable -> ((CompositeException)throwable).getExceptions().get(0) == error);
         sub.assertNoValues();
     }
 

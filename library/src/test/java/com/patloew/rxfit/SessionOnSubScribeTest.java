@@ -26,8 +26,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Single;
-import rx.observers.TestSubscriber;
+import io.reactivex.Single;
 
 import static org.mockito.Mockito.when;
 
@@ -50,7 +49,6 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
 
     @Test
     public void SessionInsertObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         SessionInsertRequest sessionInsertRequest = Mockito.mock(SessionInsertRequest.class);
         SessionInsertSingle single = PowerMockito.spy(new SessionInsertSingle(rxFit, sessionInsertRequest, null, null));
 
@@ -59,14 +57,12 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.insertSession(apiClient, sessionInsertRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void SessionInsertObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         SessionInsertRequest sessionInsertRequest = Mockito.mock(SessionInsertRequest.class);
         SessionInsertSingle single = PowerMockito.spy(new SessionInsertSingle(rxFit, sessionInsertRequest, null, null));
 
@@ -75,16 +71,14 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.insertSession(apiClient, sessionInsertRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // SessionRegisterObservable
 
     @Test
     public void SessionRegisterObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
         SessionRegisterSingle single = PowerMockito.spy(new SessionRegisterSingle(rxFit, pendingIntent, null, null));
 
@@ -93,14 +87,12 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.registerForSessions(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void SessionRegisterObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
         SessionRegisterSingle single = PowerMockito.spy(new SessionRegisterSingle(rxFit, pendingIntent, null, null));
 
@@ -109,16 +101,14 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.registerForSessions(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // SessionUnregisterObservable
 
     @Test
     public void SessionUnregisterObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
         SessionUnregisterSingle single = PowerMockito.spy(new SessionUnregisterSingle(rxFit, pendingIntent, null, null));
 
@@ -127,14 +117,12 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.unregisterForSessions(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void SessionUnregisterObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         PendingIntent pendingIntent = Mockito.mock(PendingIntent.class);
         SessionUnregisterSingle single = PowerMockito.spy(new SessionUnregisterSingle(rxFit, pendingIntent, null, null));
 
@@ -143,16 +131,14 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.unregisterForSessions(apiClient, pendingIntent)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // SessionStartObservable
 
     @Test
     public void SessionStartObservable_Success() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         Session session = Mockito.mock(Session.class);
         SessionStartSingle single = PowerMockito.spy(new SessionStartSingle(rxFit, session, null, null));
 
@@ -161,14 +147,12 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.startSession(apiClient, session)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, status);
+        assertSingleValue(Single.create(single).test(), status);
     }
 
     @Test
     public void SessionStartObservable_StatusException() {
-        TestSubscriber<Status> sub = new TestSubscriber<>();
         SessionStartSingle single = PowerMockito.spy(new SessionStartSingle(rxFit, session, null, null));
 
         setPendingResultValue(status);
@@ -176,16 +160,14 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.startSession(apiClient, session)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // SessionStopObservable
 
     @Test
     public void SessionStopObservable_Success() {
-        TestSubscriber<List<Session>> sub = new TestSubscriber<>();
         String identifier = "identifier";
         SessionStopResult sessionStopResult = Mockito.mock(SessionStopResult.class);
         SessionStopSingle single = PowerMockito.spy(new SessionStopSingle(rxFit, identifier, null, null));
@@ -201,14 +183,12 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.stopSession(apiClient, identifier)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, sessionList);
+        assertSingleValue(Single.create(single).test(), sessionList);
     }
 
     @Test
     public void SessionStopObservable_StatusException() {
-        TestSubscriber<List<Session>> sub = new TestSubscriber<>();
         String identifier = "identifier";
         SessionStopResult sessionStopResult = Mockito.mock(SessionStopResult.class);
         SessionStopSingle single = PowerMockito.spy(new SessionStopSingle(rxFit, identifier, null, null));
@@ -224,16 +204,14 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.stopSession(apiClient, identifier)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
     // SessionReadObservable
 
     @Test
     public void SessionReadObservable_Success() {
-        TestSubscriber<SessionReadResult> sub = new TestSubscriber<>();
         SessionReadRequest sessionReadRequest = Mockito.mock(SessionReadRequest.class);
         SessionReadResult sessionReadResult = Mockito.mock(SessionReadResult.class);
         SessionReadSingle single = PowerMockito.spy(new SessionReadSingle(rxFit, sessionReadRequest, null, null));
@@ -244,14 +222,12 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.readSession(apiClient, sessionReadRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertSingleValue(sub, sessionReadResult);
+        assertSingleValue(Single.create(single).test(), sessionReadResult);
     }
 
     @Test
     public void SessionReadObservable_StatusException() {
-        TestSubscriber<SessionReadResult> sub = new TestSubscriber<>();
         SessionReadRequest sessionReadRequest = Mockito.mock(SessionReadRequest.class);
         SessionReadResult sessionReadResult = Mockito.mock(SessionReadResult.class);
         SessionReadSingle single = PowerMockito.spy(new SessionReadSingle(rxFit, sessionReadRequest, null, null));
@@ -262,9 +238,8 @@ public class SessionOnSubScribeTest extends BaseOnSubscribeTest {
         when(sessionsApi.readSession(apiClient, sessionReadRequest)).thenReturn(pendingResult);
 
         setupBaseSingleSuccess(single);
-        Single.create(single).subscribe(sub);
 
-        assertError(sub, StatusException.class);
+        assertError(Single.create(single).test(), StatusException.class);
     }
 
 

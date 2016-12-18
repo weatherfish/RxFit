@@ -7,7 +7,7 @@ import com.google.android.gms.fitness.request.SessionInsertRequest;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -32,7 +32,7 @@ class SessionInsertSingle extends BaseSingle<Status> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super Status> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<Status> subscriber) {
         setupFitnessPendingResult(
                 Fitness.SessionsApi.insertSession(apiClient, sessionInsertRequest),
                 SingleResultCallBack.get(subscriber)

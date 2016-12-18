@@ -4,12 +4,11 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import rx.Scheduler;
-import rx.android.plugins.RxAndroidPlugins;
-import rx.android.plugins.RxAndroidSchedulersHook;
-import rx.plugins.RxJavaPlugins;
-import rx.plugins.RxJavaSchedulersHook;
-import rx.schedulers.Schedulers;
+import io.reactivex.Scheduler;
+import io.reactivex.android.plugins.RxAndroidPlugins;
+import io.reactivex.functions.Function;
+import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.schedulers.Schedulers;
 
 /*  Copyright 2015 Ribot Ltd.
         Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,45 +23,22 @@ import rx.schedulers.Schedulers;
 
 public class RxSchedulersOverrideRule implements TestRule {
 
-    private final RxJavaSchedulersHook mRxJavaSchedulersHook = new RxJavaSchedulersHook() {
-        @Override
-        public Scheduler getIOScheduler() {
-            return Schedulers.immediate();
-        }
-
-        @Override
-        public Scheduler getComputationScheduler() {
-            return Schedulers.immediate();
-        }
-
-        @Override
-        public Scheduler getNewThreadScheduler() {
-            return Schedulers.immediate();
-        }
-    };
-
-    private final RxAndroidSchedulersHook mRxAndroidSchedulersHook = new RxAndroidSchedulersHook() {
-        @Override
-        public Scheduler getMainThreadScheduler() {
-            return Schedulers.immediate();
-        }
-    };
-
     @Override
     public Statement apply(final Statement base, Description description) {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                RxAndroidPlugins.getInstance().reset();
-                RxAndroidPlugins.getInstance().registerSchedulersHook(mRxAndroidSchedulersHook);
+                RxAndroidPlugins.reset();
+                RxAndroidPlugins.setInitMainThreadSchedulerHandler(scheduler -> Schedulers.trampoline());
 
-                RxJavaPlugins.getInstance().reset();
-                RxJavaPlugins.getInstance().registerSchedulersHook(mRxJavaSchedulersHook);
+                RxJavaPlugins.reset();
+                RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
+                RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
 
                 base.evaluate();
 
-                RxAndroidPlugins.getInstance().reset();
-                RxJavaPlugins.getInstance().reset();
+                RxAndroidPlugins.reset();
+                RxJavaPlugins.reset();
             }
         };
     }

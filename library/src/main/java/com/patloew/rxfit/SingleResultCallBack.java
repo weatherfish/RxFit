@@ -5,8 +5,8 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 
-import rx.SingleSubscriber;
-import rx.functions.Func1;
+import io.reactivex.SingleEmitter;
+import io.reactivex.functions.Function;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -23,18 +23,18 @@ import rx.functions.Func1;
  * limitations under the License. */
 class SingleResultCallBack<T extends Result, R> implements ResultCallback<T> {
 
-    private final SingleSubscriber<? super R> subscriber;
-    private final Func1<T, R> mapper;
+    private final SingleEmitter<R> subscriber;
+    private final Function<T, R> mapper;
 
-    static <T extends Result, R> ResultCallback<T> get(@NonNull SingleSubscriber<? super R> subscriber, @NonNull Func1<T, R> mapper) {
+    static <T extends Result, R> ResultCallback<T> get(@NonNull SingleEmitter<R> subscriber, @NonNull Function<T, R> mapper) {
         return new SingleResultCallBack<>(subscriber, mapper);
     }
 
-    static <T extends Result> ResultCallback<T> get(@NonNull SingleSubscriber<? super T> subscriber) {
+    static <T extends Result> ResultCallback<T> get(@NonNull SingleEmitter<T> subscriber) {
         return new SingleResultCallBack<>(subscriber, input -> input);
     }
 
-    private SingleResultCallBack(@NonNull SingleSubscriber<? super R> subscriber, @NonNull Func1<T, R> mapper) {
+    private SingleResultCallBack(@NonNull SingleEmitter<R> subscriber, @NonNull Function<T, R> mapper) {
         this.subscriber = subscriber;
         this.mapper = mapper;
     }
@@ -44,7 +44,11 @@ class SingleResultCallBack<T extends Result, R> implements ResultCallback<T> {
         if (!result.getStatus().isSuccess()) {
             subscriber.onError(new StatusException(result.getStatus()));
         } else {
-            subscriber.onSuccess(mapper.call(result));
+            try {
+                subscriber.onSuccess(mapper.apply(result));
+            } catch(Exception e) {
+                subscriber.onError(e);
+            }
         }
     }
 }

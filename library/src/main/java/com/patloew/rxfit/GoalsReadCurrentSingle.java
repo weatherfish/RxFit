@@ -9,7 +9,7 @@ import com.google.android.gms.fitness.result.GoalsResult;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -34,7 +34,7 @@ class GoalsReadCurrentSingle extends BaseSingle<List<Goal>> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<Goal>> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<List<Goal>> subscriber) {
         setupFitnessPendingResult(
                 Fitness.GoalsApi.readCurrentGoals(apiClient, goalsReadRequest),
                 SingleResultCallBack.get(subscriber, GoalsResult::getGoals)

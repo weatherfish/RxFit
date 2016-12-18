@@ -20,8 +20,6 @@ import com.google.android.gms.fitness.SessionsApi;
 
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 
@@ -29,9 +27,9 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 
-import rx.SingleSubscriber;
-import rx.Subscriber;
-import rx.observers.TestSubscriber;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.SingleEmitter;
+import io.reactivex.observers.TestObserver;
 
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -69,11 +67,11 @@ public abstract class BaseOnSubscribeTest extends BaseTest {
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T> Subscriber<? super T> getSubscriber(BaseObservable<T> baseObservable, GoogleApiClient apiClient) {
+    protected static <T> ObservableEmitter<T> getSubscriber(BaseObservable<T> baseObservable, GoogleApiClient apiClient) {
         try {
             final Field subscriberField = BaseObservable.class.getDeclaredField("subscriptionInfoMap");
             subscriberField.setAccessible(true);
-            return ((Map<GoogleApiClient, Subscriber<? super T>>) subscriberField.get(baseObservable)).get(apiClient);
+            return ((Map<GoogleApiClient, ObservableEmitter<T>>) subscriberField.get(baseObservable)).get(apiClient);
         } catch(Exception e) {
             return null;
         }
@@ -86,43 +84,31 @@ public abstract class BaseOnSubscribeTest extends BaseTest {
 
     // Mock GoogleApiClient connection success behaviour
     protected <T> void setupBaseObservableSuccess(final BaseObservable<T> baseObservable, final GoogleApiClient apiClient) {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                final Subscriber<? super T> subscriber = ((BaseObservable.ApiClientConnectionCallbacks)invocation.getArguments()[0]).subscriber;
+        doAnswer(invocation -> {
+            final ObservableEmitter<T> subscriber = ((BaseObservable.ApiClientConnectionCallbacks)invocation.getArguments()[0]).subscriber;
 
-                doAnswer(new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        baseObservable.onGoogleApiClientReady(apiClient, subscriber);
-                        return null;
-                    }
-                }).when(apiClient).connect();
+            doAnswer(invocation1 -> {
+                baseObservable.onGoogleApiClientReady(apiClient, subscriber);
+                return null;
+            }).when(apiClient).connect();
 
-                return apiClient;
-            }
+            return apiClient;
         }).when(baseObservable).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
     }
 
     // Mock GoogleApiClient resolution behaviour
     protected <T> void setupBaseObservableResolution(final BaseObservable<T> baseObservable, final GoogleApiClient apiClient) {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                doAnswer(new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        try {
-                            final Field observableSetField = BaseRx.class.getDeclaredField("observableSet");
-                            observableSetField.setAccessible(true);
-                            ((Set<BaseRx>)observableSetField.get(baseObservable)).add(baseObservable);
-                        } catch(Exception e) { }
-                        return null;
-                    }
-                }).when(apiClient).connect();
+        doAnswer(invocation -> {
+            doAnswer(invocation1 -> {
+                try {
+                    final Field observableSetField = BaseRx.class.getDeclaredField("observableSet");
+                    observableSetField.setAccessible(true);
+                    ((Set<BaseRx>)observableSetField.get(baseObservable)).add(baseObservable);
+                } catch(Exception e) { }
+                return null;
+            }).when(apiClient).connect();
 
-                return apiClient;
-            }
+            return apiClient;
         }).when(baseObservable).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
     }
 
@@ -133,85 +119,62 @@ public abstract class BaseOnSubscribeTest extends BaseTest {
 
     // Mock GoogleApiClient connection success behaviour
     protected <T> void setupBaseSingleSuccess(final BaseSingle<T> baseSingle, final GoogleApiClient apiClient) {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                final SingleSubscriber<? super T> subscriber = ((BaseSingle.ApiClientConnectionCallbacks)invocation.getArguments()[0]).subscriber;
+        doAnswer(invocation -> {
+            final SingleEmitter<T> subscriber = ((BaseSingle.ApiClientConnectionCallbacks)invocation.getArguments()[0]).subscriber;
 
-                doAnswer(new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        baseSingle.onGoogleApiClientReady(apiClient, subscriber);
-                        return null;
-                    }
-                }).when(apiClient).connect();
+            doAnswer(invocation1 -> {
+                baseSingle.onGoogleApiClientReady(apiClient, subscriber);
+                return null;
+            }).when(apiClient).connect();
 
-                return apiClient;
-            }
+            return apiClient;
         }).when(baseSingle).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
     }
 
     // Mock GoogleApiClient connection error behaviour
     protected <T> void setupBaseObservableError(final BaseObservable<T> baseObservable) {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                final Subscriber<? super T> subscriber = ((BaseObservable.ApiClientConnectionCallbacks)invocation.getArguments()[0]).subscriber;
+        doAnswer(invocation -> {
+            final ObservableEmitter<T> subscriber = ((BaseObservable.ApiClientConnectionCallbacks)invocation.getArguments()[0]).subscriber;
 
-                doAnswer(new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        subscriber.onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient.", connectionResult));
-                        return null;
-                    }
-                }).when(apiClient).connect();
+            doAnswer(invocation1 -> {
+                subscriber.onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient.", connectionResult));
+                return null;
+            }).when(apiClient).connect();
 
-                return apiClient;
-            }
+            return apiClient;
         }).when(baseObservable).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
     }
 
     // Mock GoogleApiClient connection error behaviour
     protected <T> void setupBaseSingleError(final BaseSingle<T> baseSingle) {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                final SingleSubscriber<? super T> subscriber = ((BaseSingle.ApiClientConnectionCallbacks)invocation.getArguments()[0]).subscriber;
+        doAnswer(invocation -> {
+            final SingleEmitter<T> subscriber = ((BaseSingle.ApiClientConnectionCallbacks)invocation.getArguments()[0]).subscriber;
 
-                doAnswer(new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        subscriber.onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient.", connectionResult));
-                        return null;
-                    }
-                }).when(apiClient).connect();
+            doAnswer(invocation1 -> {
+                subscriber.onError(new GoogleAPIConnectionException("Error connecting to GoogleApiClient.", connectionResult));
+                return null;
+            }).when(apiClient).connect();
 
-                return apiClient;
-            }
+            return apiClient;
         }).when(baseSingle).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
     }
 
     @SuppressWarnings("unchecked")
     protected void setPendingResultValue(final Result result) {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ((ResultCallback)invocation.getArguments()[0]).onResult(result);
-                return null;
-            }
+        doAnswer(invocation -> {
+            ((ResultCallback)invocation.getArguments()[0]).onResult(result);
+            return null;
         }).when(pendingResult).setResultCallback(Matchers.<ResultCallback>any());
     }
 
-    protected static void assertError(TestSubscriber sub, Class<? extends Throwable> errorClass) {
+    protected static void assertError(TestObserver sub, Class<? extends Throwable> errorClass) {
         sub.assertError(errorClass);
         sub.assertNoValues();
-        sub.assertUnsubscribed();
     }
 
     @SuppressWarnings("unchecked")
-    protected static void assertSingleValue(TestSubscriber sub, Object value) {
-        sub.assertCompleted();
-        sub.assertUnsubscribed();
+    protected static void assertSingleValue(TestObserver sub, Object value) {
+        sub.assertComplete();
         sub.assertValue(value);
     }
 }

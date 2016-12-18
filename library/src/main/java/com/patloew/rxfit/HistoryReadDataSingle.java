@@ -7,7 +7,7 @@ import com.google.android.gms.fitness.result.DataReadResult;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -32,7 +32,7 @@ class HistoryReadDataSingle extends BaseSingle<DataReadResult> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super DataReadResult> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<DataReadResult> subscriber) {
         setupFitnessPendingResult(
                 Fitness.HistoryApi.readData(apiClient, dataReadRequest),
                 SingleResultCallBack.get(subscriber)

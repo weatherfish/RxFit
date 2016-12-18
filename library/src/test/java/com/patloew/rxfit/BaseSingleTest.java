@@ -15,16 +15,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import rx.Single;
-import rx.SingleSubscriber;
-import rx.observers.TestSubscriber;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Cancellable;
+import io.reactivex.observers.TestObserver;
 
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(PowerMockRunner.class)
-@PrepareOnlyThisForTest({ ContextCompat.class, Fitness.class, Status.class, ConnectionResult.class, SingleSubscriber.class })
+@PrepareOnlyThisForTest({ ContextCompat.class, Fitness.class, Status.class, ConnectionResult.class, SingleEmitter.class })
 @SuppressStaticInitializationFor("com.google.android.gms.fitness.Fitness")
 public class BaseSingleTest extends BaseOnSubscribeTest {
 
@@ -49,52 +49,44 @@ public class BaseSingleTest extends BaseOnSubscribeTest {
     @Test
     public void BaseObservable_ApiClient_Connected() {
         final Object object = new Object();
-        TestSubscriber<Object> sub = new TestSubscriber<>();
         BaseSingle<Object> single = spy(new BaseSingle<Object>(ctx, new Api[] {}, null) {
             @Override
-            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Object> subscriber) {
+            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<? super Object> subscriber) {
                 subscriber.onSuccess(object);
             }
         });
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                BaseRx.ApiClientConnectionCallbacks callbacks = invocation.getArgumentAt(0, BaseRx.ApiClientConnectionCallbacks.class);
-                callbacks.setClient(apiClient);
-                callbacks.onConnected(null);
-                return apiClient;
-            }
+        doAnswer(invocation -> {
+            BaseRx.ApiClientConnectionCallbacks callbacks = invocation.getArgumentAt(0, BaseRx.ApiClientConnectionCallbacks.class);
+            callbacks.setClient(apiClient);
+            callbacks.onConnected(null);
+            return apiClient;
         }).when(single).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
 
-        Single.create(single).subscribe(sub);
+        TestObserver<Object> sub = Single.create(single).test();
 
         sub.assertValue(object);
-        sub.assertCompleted();
+        sub.assertComplete();
     }
 
     @Test
     public void BaseObservable_ApiClient_ConnectionSuspended() {
         final Object object = new Object();
-        TestSubscriber<Object> sub = new TestSubscriber<>();
         BaseSingle<Object> single = spy(new BaseSingle<Object>(ctx, new Api[] {}, null) {
             @Override
-            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Object> subscriber) {
+            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<? super Object> subscriber) {
                 subscriber.onSuccess(object);
             }
         });
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                BaseRx.ApiClientConnectionCallbacks callbacks = invocation.getArgumentAt(0, BaseRx.ApiClientConnectionCallbacks.class);
-                callbacks.setClient(apiClient);
-                callbacks.onConnectionSuspended(0);
-                return apiClient;
-            }
+        doAnswer(invocation -> {
+            BaseRx.ApiClientConnectionCallbacks callbacks = invocation.getArgumentAt(0, BaseRx.ApiClientConnectionCallbacks.class);
+            callbacks.setClient(apiClient);
+            callbacks.onConnectionSuspended(0);
+            return apiClient;
         }).when(single).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
 
-        Single.create(single).subscribe(sub);
+        TestObserver<Object> sub = Single.create(single).test();
 
         sub.assertNoValues();
         sub.assertError(GoogleAPIConnectionSuspendedException.class);
@@ -103,27 +95,23 @@ public class BaseSingleTest extends BaseOnSubscribeTest {
     @Test
     public void BaseObservable_ApiClient_ConnectionFailed_NoResulution() {
         final Object object = new Object();
-        TestSubscriber<Object> sub = new TestSubscriber<>();
         BaseSingle<Object> single = spy(new BaseSingle<Object>(ctx, new Api[] {}, null) {
             @Override
-            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Object> subscriber) {
+            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<? super Object> subscriber) {
                 subscriber.onSuccess(object);
             }
         });
 
         doReturn(false).when(connectionResult).hasResolution();
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                BaseRx.ApiClientConnectionCallbacks callbacks = invocation.getArgumentAt(0, BaseRx.ApiClientConnectionCallbacks.class);
-                callbacks.setClient(apiClient);
-                callbacks.onConnectionFailed(connectionResult);
-                return apiClient;
-            }
+        doAnswer(invocation -> {
+            BaseRx.ApiClientConnectionCallbacks callbacks = invocation.getArgumentAt(0, BaseRx.ApiClientConnectionCallbacks.class);
+            callbacks.setClient(apiClient);
+            callbacks.onConnectionFailed(connectionResult);
+            return apiClient;
         }).when(single).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
 
-        Single.create(single).subscribe(sub);
+        TestObserver<Object> sub = Single.create(single).test();
 
         sub.assertNoValues();
         sub.assertError(GoogleAPIConnectionException.class);
@@ -132,30 +120,26 @@ public class BaseSingleTest extends BaseOnSubscribeTest {
     @Test
     public void BaseObservable_ApiClient_ConnectionFailed_Resolution() {
         final Object object = new Object();
-        TestSubscriber<Object> sub = new TestSubscriber<>();
         BaseSingle<Object> single = spy(new BaseSingle<Object>(rxFit, null, null) {
             @Override
-            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Object> subscriber) {
+            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<? super Object> subscriber) {
                 subscriber.onSuccess(object);
             }
         });
 
         doReturn(true).when(connectionResult).hasResolution();
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                BaseRx.ApiClientConnectionCallbacks callbacks = invocation.getArgumentAt(0, BaseRx.ApiClientConnectionCallbacks.class);
-                callbacks.setClient(apiClient);
-                callbacks.onConnectionFailed(connectionResult);
-                return apiClient;
-            }
+        doAnswer(invocation -> {
+            BaseRx.ApiClientConnectionCallbacks callbacks = invocation.getArgumentAt(0, BaseRx.ApiClientConnectionCallbacks.class);
+            callbacks.setClient(apiClient);
+            callbacks.onConnectionFailed(connectionResult);
+            return apiClient;
         }).when(single).createApiClient(Matchers.any(BaseRx.ApiClientConnectionCallbacks.class));
 
-        Single.create(single).subscribe(sub);
+        TestObserver<Object> sub = Single.create(single).test();
 
         sub.assertNoValues();
-        sub.assertNoTerminalEvent();
+        sub.assertNotTerminated();
 
         verify(ctx).startActivity(Matchers.any(Intent.class));
     }
@@ -165,17 +149,20 @@ public class BaseSingleTest extends BaseOnSubscribeTest {
         final Object object = new Object();
         BaseSingle<Object> single = spy(new BaseSingle<Object>(rxFit, null, null) {
             @Override
-            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Object> subscriber) {
+            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<? super Object> subscriber) {
                 subscriber.onSuccess(object);
             }
         });
 
-        SingleSubscriber sub = PowerMockito.spy(new SingleSubscriber() {
+        SingleEmitter sub = PowerMockito.spy(new SingleEmitter() {
             @Override public void onSuccess(Object value) { }
             @Override public void onError(Throwable error) { }
+            @Override public void setDisposable(Disposable s) {}
+            @Override public void setCancellable(Cancellable c) { }
+            @Override public boolean isDisposed() { return false;}
         });
 
-        PowerMockito.doReturn(false).when(sub).isUnsubscribed();
+        PowerMockito.doReturn(false).when(sub).isDisposed();
         single.subscriptionInfoMap.put(apiClient, sub);
 
         single.handleResolutionResult(Activity.RESULT_OK, connectionResult);
@@ -190,19 +177,22 @@ public class BaseSingleTest extends BaseOnSubscribeTest {
         final Object object = new Object();
         BaseSingle<Object> single = spy(new BaseSingle<Object>(rxFit, null, null) {
             @Override
-            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Object> subscriber) {
+            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<? super Object> subscriber) {
                 subscriber.onSuccess(object);
             }
         });
 
-        SingleSubscriber sub = PowerMockito.spy(new SingleSubscriber() {
+        SingleEmitter sub = PowerMockito.spy(new SingleEmitter() {
             @Override public void onSuccess(Object value) { }
             @Override public void onError(Throwable error) { }
+            @Override public void setDisposable(Disposable s) {}
+            @Override public void setCancellable(Cancellable c) { }
+            @Override public boolean isDisposed() { return false;}
         });
 
         RuntimeException exception = new RuntimeException();
         doThrow(exception).when(apiClient).connect();
-        PowerMockito.doReturn(false).when(sub).isUnsubscribed();
+        PowerMockito.doReturn(false).when(sub).isDisposed();
         single.subscriptionInfoMap.put(apiClient, sub);
 
         single.handleResolutionResult(Activity.RESULT_OK, connectionResult);
@@ -217,17 +207,20 @@ public class BaseSingleTest extends BaseOnSubscribeTest {
         final Object object = new Object();
         BaseSingle<Object> single = spy(new BaseSingle<Object>(rxFit, null, null) {
             @Override
-            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleSubscriber<? super Object> subscriber) {
+            protected void onGoogleApiClientReady(GoogleApiClient apiClient, SingleEmitter<? super Object> subscriber) {
                 subscriber.onSuccess(object);
             }
         });
 
-        SingleSubscriber sub = PowerMockito.spy(new SingleSubscriber() {
+        SingleEmitter sub = PowerMockito.spy(new SingleEmitter() {
             @Override public void onSuccess(Object value) { }
             @Override public void onError(Throwable error) { }
+            @Override public void setDisposable(Disposable s) {}
+            @Override public void setCancellable(Cancellable c) { }
+            @Override public boolean isDisposed() { return false;}
         });
 
-        PowerMockito.doReturn(false).when(sub).isUnsubscribed();
+        PowerMockito.doReturn(false).when(sub).isDisposed();
         single.subscriptionInfoMap.put(apiClient, sub);
 
         single.handleResolutionResult(Activity.RESULT_CANCELED, connectionResult);

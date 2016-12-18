@@ -8,8 +8,8 @@ import com.google.android.gms.common.api.Scope;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Completable;
-import rx.Observable;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
 
 /* Copyright 2016 Patrick Löwenstein
  *

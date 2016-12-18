@@ -15,9 +15,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.subscriptions.Subscriptions;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 /* Copyright (C) 2015 Michał Charmas (http://blog.charmas.pl)
  *
@@ -38,10 +37,10 @@ import rx.subscriptions.Subscriptions;
  * FILE MODIFIED by Patrick Löwenstein, 2016
  *
  */
-abstract class BaseObservable<T> extends BaseRx<T> implements Observable.OnSubscribe<T> {
+abstract class BaseObservable<T> extends BaseRx<T> implements ObservableOnSubscribe<T> {
     private final boolean handleResolution;
 
-    private final Map<GoogleApiClient, Subscriber<? super T>> subscriptionInfoMap = new ConcurrentHashMap<>();
+    private final Map<GoogleApiClient, ObservableEmitter<T>> subscriptionInfoMap = new ConcurrentHashMap<>();
 
     protected BaseObservable(@NonNull RxFit rxFit, Long timeout, TimeUnit timeUnit) {
         super(rxFit, timeout, timeUnit);
@@ -54,7 +53,7 @@ abstract class BaseObservable<T> extends BaseRx<T> implements Observable.OnSubsc
     }
 
     @Override
-    public final void call(Subscriber<? super T> subscriber) {
+    public final void subscribe(ObservableEmitter<T> subscriber) throws Exception {
         final GoogleApiClient apiClient = createApiClient(new ApiClientConnectionCallbacks(subscriber));
         subscriptionInfoMap.put(apiClient, subscriber);
 
@@ -64,21 +63,21 @@ abstract class BaseObservable<T> extends BaseRx<T> implements Observable.OnSubsc
             subscriber.onError(ex);
         }
 
-        subscriber.add(Subscriptions.create(() -> {
+        subscriber.setCancellable(() -> {
             if (apiClient.isConnected() || apiClient.isConnecting()) {
                 onUnsubscribed(apiClient);
                 apiClient.disconnect();
             }
 
             subscriptionInfoMap.remove(apiClient);
-        }));
+        });
     }
 
-    protected abstract void onGoogleApiClientReady(GoogleApiClient apiClient, Subscriber<? super T> subscriber);
+    protected abstract void onGoogleApiClientReady(GoogleApiClient apiClient, ObservableEmitter<T> subscriber);
 
     protected final void handleResolutionResult(int resultCode, ConnectionResult connectionResult) {
-        for (Map.Entry<GoogleApiClient, Subscriber<? super T>> entry : subscriptionInfoMap.entrySet()) {
-            if (!entry.getValue().isUnsubscribed()) {
+        for (Map.Entry<GoogleApiClient, ObservableEmitter<T>> entry : subscriptionInfoMap.entrySet()) {
+            if (!entry.getValue().isDisposed()) {
                 if (resultCode == Activity.RESULT_OK) {
                     try {
                         entry.getKey().connect();
@@ -94,11 +93,11 @@ abstract class BaseObservable<T> extends BaseRx<T> implements Observable.OnSubsc
 
     protected class ApiClientConnectionCallbacks extends BaseRx.ApiClientConnectionCallbacks {
 
-        final protected Subscriber<? super T> subscriber;
+        final protected ObservableEmitter<T> subscriber;
 
         private GoogleApiClient apiClient;
 
-        private ApiClientConnectionCallbacks(Subscriber<? super T> subscriber) {
+        private ApiClientConnectionCallbacks(ObservableEmitter<T> subscriber) {
             this.subscriber = subscriber;
         }
 

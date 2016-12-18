@@ -19,7 +19,7 @@ import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import rx.Single;
+import io.reactivex.Single;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.times;

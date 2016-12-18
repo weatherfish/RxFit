@@ -1,9 +1,11 @@
 package com.patloew.rxfit;
 
-import rx.Observable;
-import rx.Single;
-import rx.exceptions.Exceptions;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.Single;
+import io.reactivex.SingleTransformer;
+import io.reactivex.exceptions.Exceptions;
+import io.reactivex.functions.Function;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -35,15 +37,15 @@ public class RxFitOnExceptionResumeNext {
 
     private RxFitOnExceptionResumeNext() { }
 
-    public static <T, R extends T> Observable.Transformer<T, T> with(final Observable<R> other) {
+    public static <T, R extends T> ObservableTransformer<T, T> with(final Observable<R> other) {
         return source -> source.onErrorResumeNext(getThrowableMapper(other));
     }
 
-    public static <T, R extends T> Single.Transformer<T, T> with(final Single<R> other) {
+    public static <T, R extends T> SingleTransformer<T, T> with(final Single<R> other) {
         return source -> source.onErrorResumeNext(getThrowableMapper(other));
     }
 
-    private static <R> Func1<Throwable, R> getThrowableMapper(R other) {
+    private static <R> Function<Throwable, R> getThrowableMapper(R other) {
         return throwable -> {
             if(shouldPropagateThrowable(throwable)) { throw Exceptions.propagate(throwable); }
             return other;

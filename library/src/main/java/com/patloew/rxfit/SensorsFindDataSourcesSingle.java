@@ -9,7 +9,7 @@ import com.google.android.gms.fitness.request.DataSourcesRequest;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.SingleSubscriber;
+import io.reactivex.SingleEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -36,7 +36,7 @@ class SensorsFindDataSourcesSingle extends BaseSingle<List<DataSource>> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleSubscriber<? super List<DataSource>> subscriber) {
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, final SingleEmitter<List<DataSource>> subscriber) {
         setupFitnessPendingResult(
                 Fitness.SensorsApi.findDataSources(apiClient, dataSourcesRequest),
                 SingleResultCallBack.get(subscriber, dataSourcesResult -> {

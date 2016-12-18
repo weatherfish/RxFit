@@ -8,7 +8,7 @@ import com.google.android.gms.fitness.request.DataTypeCreateRequest;
 
 import java.util.concurrent.TimeUnit;
 
-import rx.Single;
+import io.reactivex.Single;
 
 /* Copyright 2016 Patrick Löwenstein
  *

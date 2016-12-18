@@ -2,7 +2,7 @@ package com.patloew.rxfit;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import rx.Subscriber;
+import io.reactivex.ObservableEmitter;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -24,7 +24,7 @@ class CheckConnectionObservable extends BaseObservable<Void> {
     }
 
     @Override
-    protected void onGoogleApiClientReady(GoogleApiClient apiClient, Subscriber<? super Void> subscriber) {
-        subscriber.onCompleted();
+    protected void onGoogleApiClientReady(GoogleApiClient apiClient, ObservableEmitter<Void> subscriber) {
+        subscriber.onComplete();
     }
 }

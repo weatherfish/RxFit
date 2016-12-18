@@ -16,10 +16,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -36,7 +35,7 @@ import rx.subscriptions.CompositeSubscription;
  * limitations under the License. */
 public class MainPresenter {
 
-    private final CompositeSubscription subscription = new CompositeSubscription();
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
     private final RxFit rxFit;
 
@@ -54,7 +53,7 @@ public class MainPresenter {
 
     public void detachView() {
         this.view = null;
-        subscription.clear();
+        disposable.clear();
     }
 
     void getFitnessData() {
@@ -67,13 +66,13 @@ public class MainPresenter {
 
         // First, request all data from the server. If there is an error (e.g. timeout),
         // switch to normal request
-        subscription.add(
+        disposable.add(
                 rxFit.history().readBuckets(dataReadRequestServer)
-                .doOnError(throwable -> { if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) Log.e("MainActivity", "Timeout on server query request", throwable); })
-                .compose(RxFitOnExceptionResumeNext.with(rxFit.history().readBuckets(dataReadRequest)))
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::onBucketLoaded, this::onBucketLoadError, () -> view.onFitnessSessionDataLoaded(fitnessSessionDataList))
+                    .doOnError(throwable -> { if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) Log.e("MainActivity", "Timeout on server query request", throwable); })
+                    .compose(RxFitOnExceptionResumeNext.with(rxFit.history().readBuckets(dataReadRequest)))
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::onBucketLoaded, this::onBucketLoadError, () -> view.onFitnessSessionDataLoaded(fitnessSessionDataList))
         );
     }
 
